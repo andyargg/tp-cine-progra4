@@ -1,30 +1,113 @@
-# TP1 - Programación IV - Sistema de Cine
-## Requerimientos extraídos de la consigna y el intercambio de emails
+# 1. Enunciado del Alcance del Proyecto
+
+<table>
+<tr><th>Componente</th><th>Descripción</th></tr>
+
+<tr>
+<td><b>1.1. Título del Proyecto</b></td>
+<td>Sistema de venta de entradas y gestión integral para cine (TP1 - Programación IV)</td>
+</tr>
+
+<tr>
+<td><b>1.2. Objetivos del Proyecto</b></td>
+<td>
+<ol>
+<li>Desarrollar una aplicación web completa (Angular + Supabase + PWA) que permita a los clientes de un cine comprar entradas y productos de candy bar de forma online, con generación de PDF y QR.</li>
+<li>Implementar un panel de administración que permita controlar salas, funciones, precios, cupones, puntos, combos y reportes del negocio.</li>
+<li>Lograr que el proyecto se complete <b>dentro del tiempo de cursada disponible</b>, cubriendo la totalidad de los temas evaluados por la cátedra (Angular, Supabase, PWA, lógica de negocio).</li>
+</ol>
+</td>
+</tr>
+
+<tr>
+<td><b>1.3. Riesgos Iniciales Definidos</b></td>
+<td>
+<ol>
+<li>Desconocimiento previo del equipo sobre Angular, Supabase y PWA. <b>Probabilidad: Alta. Impacto: Alto.</b></li>
+<li>Alcance ampliado de forma incremental por el cliente en cada email (scope creep), sin tiempo adicional de cursada. <b>Probabilidad: Alta. Impacto: Medio.</b></li>
+<li>Complejidad del algoritmo de asignación automática de salas sin solapamiento de horarios. <b>Probabilidad: Media. Impacto: Alto.</b></li>
+<li>Tiempo de cursada limitado frente a la cantidad de módulos a entregar. <b>Probabilidad: Alta. Impacto: Alto.</b></li>
+</ol>
+</td>
+</tr>
+
+<tr>
+<td><b>1.4. Fases Principales del Proyecto (EDT)</b></td>
+<td>
+El alcance comprende:
+<ol>
+<li><b>Sprint 0 - Setup y arquitectura</b>
+<br>Hitos: (1) Proyecto Angular + Supabase conectados. (2) Deploy inicial funcionando en URL pública.</li>
+<li><b>Sprint 1 - Usuarios y autenticación</b>
+<br>Hitos: (1) Registro/login operativo. (2) Roles diferenciados (cliente, anónimo, empleado, admin).</li>
+<li><b>Sprint 2 - Catálogo de películas y salas</b>
+<br>Hitos: (1) CRUD de películas y salas. (2) Buscador con filtro por género funcionando.</li>
+<li><b>Sprint 3 - Funciones y asignación automática de salas</b>
+<br>Hitos: (1) Algoritmo de asignación sin solapamientos. (2) Preventa configurable por película.</li>
+<li><b>Sprint 4 - Selección de butacas y compra de entradas</b>
+<br>Hitos: (1) Mapa de butacas en tiempo real. (2) Flujo de compra completo con PDF + QR.</li>
+<li><b>Sprint 5 - Candy bar y combos</b>
+<br>Hitos: (1) Compra combinada entrada + candy bar bajo un mismo QR.</li>
+<li><b>Sprint 6 - Cupones y programa de fidelización</b>
+<br>Hitos: (1) Cupones configurables y segmentados. (2) Acumulación y canje de puntos.</li>
+<li><b>Sprint 7 - Reseñas y "Mis películas"</b>
+<br>Hitos: (1) Reseñas con promedio visibles antes de comprar. (2) Historial personal de películas vistas.</li>
+<li><b>Sprint 8 - Panel de administración y reportes</b>
+<br>Hitos: (1) Reportes de facturación exportables (PDF/Excel). (2) Log de actividad.</li>
+<li><b>Sprint 9 - App de empleados (validación de QR)</b>
+<br>Hitos: (1) Escaneo y validación operativos, con carga manual de respaldo.</li>
+<li><b>Sprint 10 - PWA, UX final y despliegue</b>
+<br>Hitos: (1) PWA instalable. (2) Despliegue final y README completo.</li>
+</ol>
+</td>
+</tr>
+
+<tr>
+<td><b>1.5. Restricciones</b></td>
+<td>
+<ol>
+<li>Se cuenta con el tiempo de la cursada cuatrimestral para completar el proyecto, sin prórroga.</li>
+<li>La aprobación y/o promoción depende exclusivamente de la <b>defensa oral</b>, no solo de que el código funcione.</li>
+<li>Debe usarse obligatoriamente <b>Angular, Supabase y PWA</b> - tecnologías impuestas por la cátedra.</li>
+<li>El estilo visual debe ser propio y producido: no puede usarse un template genérico sin modificar.</li>
+</ol>
+</td>
+</tr>
+
+<tr>
+<td><b>4.1. Asunciones</b></td>
+<td>
+<ol>
+<li>El cliente (empresario) no va a estar disponible para nuevas consultas fuera de los emails ya recibidos en la consigna.</li>
+<li>Se asume un único edificio de cine, con salas de layout fijo salvo los cambios indicados explícitamente (filas accesibles J/K y VIP R/S/T).</li>
+<li>La funcionalidad de "mapa del cine" (mencionada por el cliente sin luz verde) queda <b>fuera de este alcance</b>.</li>
+<li>Los criterios listados en "A considerar" de la consigna son los que van a usar los profesores para evaluar la entrega.</li>
+</ol>
+</td>
+</tr>
+
+<tr>
+<td><b>4.2. Hitos</b></td>
+<ol>
+<li>Documento de requerimientos (este Enunciado del Alcance) aprobado - Sprint 0.</li>
+<li>Primer despliegue funcional (Angular + Supabase conectados) - Sprint 0.</li>
+<li>Flujo de compra de entradas end-to-end operativo - Sprint 4.</li>
+<li>Panel de administración completo con reportes - Sprint 8.</li>
+<li>Aplicación PWA instalable y desplegada en producción - Sprint 10.</li>
+<li>Defensa oral - fecha de entrega.</li>
+</ol>
+</td>
+</tr>
+
+</table>
 
 ---
 
-## 0. Cláusulas de entrega (consigna formal)
+# Anexo: Detalle de requerimientos funcionales por módulo
 
-1. Crear documento que resuma todos los requerimientos a realizar (este documento).
-2. Crear la aplicación utilizando todos los temas vistos en clase.
-3. Defender oralmente las decisiones tomadas el día de la entrega.
-4. Aplicación **desplegada** con URL funcional.
-5. Código publicado en **GitHub**.
-6. **README** con arquitectura y decisiones técnicas.
+> Desglose línea por línea de todo lo pedido en el intercambio de emails de la consigna. Sirve de base para completar la sección 1.4 (EDT) y para no perder ningún detalle mencionado por el cliente.
 
-### A considerar (criterios de evaluación)
-
-- El estilo visual de la aplicación debe ser **único y producido** (no template genérico).
-- Los profesores pueden pedir cambios si no se respeta la consigna.
-- La aprobación y/o promoción depende de la **defensa oral**.
-- Se evalúa el uso correcto de **Angular**, buenas prácticas y técnicas vistas en clase.
-- Se evalúa la integración con **Supabase**.
-- Se evalúa la integración de **PWA**.
-- Se evalúa la **lógica de negocio** lograda.
-
----
-
-## 1. Estructura del cine
+## Estructura del cine
 
 - Es un edificio único, con varias salas.
 - Distribución **original** de butacas por sala: 20 filas (A–T) x 3 columnas de 4, 20 y 4 butacas.
@@ -33,7 +116,7 @@
 - Las butacas accesibles deben resaltarse visualmente distinto del resto.
 - Selección de butacas **en tiempo real**: si otro usuario está comprando en simultáneo, deben verse las butacas que ese otro usuario está ocupando/reservando en el momento.
 
-## 2. Películas y funciones
+## Películas y funciones
 
 - Atributos de película: nombre, imagen, sinopsis, duración, uno o varios **géneros**, formato (2D/3D/4D/5D), idioma (castellano/subtitulado).
 - El admin controla qué películas se muestran y en qué horarios.
@@ -43,7 +126,7 @@
 - **Próximamente**: sección con películas a estrenarse en las próximas semanas. El usuario puede activar una alerta/notificación para cuando la entrada esté disponible.
 - **Preventa**: configurable por película. Se puede abrir la venta 7 días antes del estreno con precio especial; pasada la fecha de preventa, el precio vuelve a ser el normal.
 
-## 3. Usuarios y registro
+## Usuarios y registro
 
 - Datos a recolectar en el registro: mail, nombre, apellido, fecha de nacimiento, tipo de sangre, color de ojos, cantidad de días de vacaciones por año.
 - Beneficio por registrarse: cupón de 20% de descuento en la primera compra (el porcentaje debe ser **configurable** por el admin).
@@ -52,7 +135,7 @@
 - Perfil de usuario debe mostrar: puntos acumulados, historial de canjes, crédito disponible en cuenta.
 - Sección **"Mis películas"**: historial visual de películas vistas por el usuario, con póster, fecha y su propia calificación.
 
-## 4. Reseñas y descubrimiento
+## Reseñas y descubrimiento
 
 - Los usuarios pueden calificar con estrellas y dejar un comentario corto por película.
 - Las reseñas deben poder verse **antes** de comprar la entrada.
@@ -61,7 +144,7 @@
 - El listado de películas debe tener un **buscador**.
 - El buscador debe poder **filtrar por género** (una película puede tener varios géneros).
 
-## 5. Compra de entradas
+## Compra de entradas
 
 - El sistema genera un **PDF** con los datos de la entrada y un **código QR** para presentar en el ingreso.
 - Se pueden comprar productos de candy bar junto con la entrada, retirables con el mismo QR.
@@ -69,12 +152,12 @@
 - **Cancelación**: el usuario puede cancelar una compra hasta 2 horas antes de la función. No hay devolución de dinero; en cambio se otorga **crédito en cuenta** que puede combinarse con otros métodos de pago en compras futuras.
 - Una vez que una entrada se valida (o se entrega la comida asociada), el QR deja de ser válido.
 
-## 6. Candy bar
+## Candy bar
 
 - Productos (pochoclos, bebidas, etc.) administrables, organizados en categorías.
 - Compra combinada con la entrada, un mismo QR sirve para retirar comida y para el ingreso a sala.
 
-## 7. Programa de fidelización (puntos)
+## Programa de fidelización (puntos)
 
 - Solo para usuarios registrados: 1 punto por cada peso gastado.
 - Los puntos se canjean por entradas gratis o productos de candy bar.
@@ -82,7 +165,7 @@
 - El usuario ve en su perfil el saldo de puntos y el historial de canjes.
 - Los puntos **no son transferibles** entre usuarios.
 
-## 8. Administración (rol admin)
+## Administración (rol admin)
 
 - CRUD completo de salas, funciones, distribución de butacas, productos, categorías, combos y precios.
 - Configuración de cupones (porcentaje, segmentación por edad, vigencia).
@@ -91,24 +174,24 @@
 - Reportes: facturación por día y cantidad de entradas vendidas.
 - Exportación de reportes a **PDF y Excel**.
 - Gráficos: películas más vistas por semana y por mes; producto de candy bar más vendido.
-- **Log de actividad**: quién creó una función, quién modificó un precio, quién validó un QR — todo con fecha y hora.
+- **Log de actividad**: quién creó una función, quién modificó un precio, quién validó un QR - todo con fecha y hora.
 
-## 9. Rol empleado
+## Rol empleado
 
 - Usuario de tipo empleado para escanear QRs y validar entradas (cine) y consumos (candy bar).
 - Posibilidad de ingresar el código manualmente si el lector/scanner falla.
 - Tras validar, el QR queda inutilizado.
 
-## 10. UX / UI
+## UX / UI
 
 - Interfaces simples y fáciles de navegar tanto para clientes como para empleados.
 - Selector de fecha/hora amigable (explícitamente se pide **no** usar inputs nativos tipo calendario básico como el de la imagen de referencia del cliente).
 - Minimizar el scroll excesivo.
 - Estilo visual propio, no genérico.
 
-## 11. Fuera de alcance (mencionado pero sin luz verde)
+## Fuera de alcance (mencionado pero sin luz verde)
 
-- Pantalla con mapa del cine que indique la sala asignada a la entrada comprada: el cliente lo menciona como idea a futuro, **sin confirmar** — no implementar en esta entrega salvo indicación posterior.
+- Pantalla con mapa del cine que indique la sala asignada a la entrada comprada: el cliente lo menciona como idea a futuro, **sin confirmar** - no implementar en esta entrega salvo indicación posterior.
 
 ---
 
