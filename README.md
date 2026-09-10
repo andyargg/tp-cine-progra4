@@ -24,7 +24,7 @@ _Pendiente — se va a completar a medida que avancen los sprints (ver [02-sprin
 
 ## Estado
 
-- [ ] Sprint 0 — Setup y arquitectura
+- [x] Sprint 0 — Setup y arquitectura ([tp-cine-progra4.vercel.app](https://tp-cine-progra4.vercel.app))
 - [ ] Sprint 1 — Usuarios y autenticación
 - [ ] Sprint 2 — Catálogo de películas y salas
 - [ ] Sprint 3 — Funciones y asignación automática de salas
