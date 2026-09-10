@@ -4,3 +4,6 @@ ppts/
 # OS / editor
 .DS_Store
 Thumbs.db
+
+# Vercel CLI local link (contiene IDs de proyecto, no secretos, pero es local)
+.vercel
