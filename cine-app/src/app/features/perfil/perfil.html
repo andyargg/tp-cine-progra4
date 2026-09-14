@@ -1,0 +1,60 @@
+<section class="perfil">
+  @if (usuario(); as u) {
+    <h1>Mi perfil</h1>
+
+    <div class="perfil__resumen">
+      <div class="dato">
+        <span class="dato__label">Email</span>
+        <span class="dato__valor">{{ u.email }}</span>
+      </div>
+      <div class="dato">
+        <span class="dato__label">Edad</span>
+        <span class="dato__valor">{{ edad() }} años</span>
+      </div>
+      <div class="dato">
+        <span class="dato__label">Puntos acumulados</span>
+        <span class="dato__valor">{{ u.puntos_acumulados }}</span>
+      </div>
+      <div class="dato">
+        <span class="dato__label">Crédito disponible</span>
+        <span class="dato__valor">&#36;{{ u.credito_disponible }}</span>
+      </div>
+      <div class="dato">
+        <span class="dato__label">Cupón de bienvenida</span>
+        <span class="dato__valor">{{ u.cupon_bienvenida_usado ? 'Usado' : 'Disponible' }}</span>
+      </div>
+    </div>
+
+    <form [formGroup]="form" (ngSubmit)="guardar()" novalidate>
+      <label>
+        Nombre
+        <input type="text" formControlName="nombre" />
+      </label>
+
+      <label>
+        Apellido
+        <input type="text" formControlName="apellido" />
+      </label>
+
+      <label>
+        Fecha de nacimiento
+        <input type="date" formControlName="fechaNacimiento" />
+      </label>
+
+      @if (estado() === 'guardado') {
+        <p class="mensaje mensaje--ok">Datos actualizados.</p>
+      }
+      @if (estado() === 'error') {
+        <p class="mensaje mensaje--error">No se pudieron guardar los cambios.</p>
+      }
+
+      <button type="submit" [disabled]="estado() === 'guardando'">
+        @if (estado() === 'guardando') {
+          Guardando...
+        } @else {
+          Guardar cambios
+        }
+      </button>
+    </form>
+  }
+</section>

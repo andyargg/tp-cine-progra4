@@ -35,6 +35,30 @@ create trigger trg_usuarios_bloquear_campos_sensibles
 before update on public.usuarios
 for each row execute function public.usuarios_bloquear_campos_sensibles();
 
+create or replace function public.manejar_nuevo_usuario()
+returns trigger
+language plpgsql
+security definer
+set search_path = public
+as $$
+begin
+  insert into public.usuarios (id, email, nombre, apellido, fecha_nacimiento)
+  values (
+    new.id,
+    new.email,
+    new.raw_user_meta_data ->> 'nombre',
+    new.raw_user_meta_data ->> 'apellido',
+    (new.raw_user_meta_data ->> 'fecha_nacimiento')::date
+  );
+  return new;
+end;
+$$;
+
+drop trigger if exists on_auth_user_created on auth.users;
+create trigger on_auth_user_created
+after insert on auth.users
+for each row execute function public.manejar_nuevo_usuario();
+
 alter table public.configuracion enable row level security;
 alter table public.usuarios enable row level security;
 alter table public.generos enable row level security;
@@ -100,7 +124,6 @@ create policy "cupones_all_staff" on public.cupones for all using (public.es_sta
 
 create policy "usuarios_select_staff" on public.usuarios for select using (public.es_staff());
 create policy "usuarios_select_propio" on public.usuarios for select using (id = auth.uid());
-create policy "usuarios_insert_propio" on public.usuarios for insert with check (id = auth.uid());
 create policy "usuarios_update_propio" on public.usuarios for update using (id = auth.uid());
 create policy "usuarios_update_admin" on public.usuarios for update using (public.es_admin());
 

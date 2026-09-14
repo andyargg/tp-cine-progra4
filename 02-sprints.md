@@ -21,7 +21,7 @@
 
 ### Sprint 1 — Usuarios y autenticación
 **Módulo: Usuarios / Auth**
-- Registro con datos requeridos (mail, nombre, apellido, fecha nacimiento, tipo de sangre, color de ojos, días de vacaciones/año).
+- Registro con datos requeridos (mail, nombre, apellido, fecha nacimiento).
 - Login/logout, recuperación de contraseña (Supabase Auth).
 - Roles: cliente registrado, anónimo (guest checkout), empleado, admin.
 - Pantalla de perfil (base): datos personales editables.

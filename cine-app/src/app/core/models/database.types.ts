@@ -8,3 +8,16 @@ export interface Configuracion {
   clave: string;
   valor: unknown;
 }
+
+export interface Usuario {
+  id: string;
+  email: string;
+  nombre: string;
+  apellido: string;
+  fecha_nacimiento: string;
+  rol: RolUsuario;
+  puntos_acumulados: number;
+  credito_disponible: number;
+  cupon_bienvenida_usado: boolean;
+  created_at: string;
+}

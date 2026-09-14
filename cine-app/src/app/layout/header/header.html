@@ -1,3 +1,13 @@
 <header class="header">
   <a class="brand" routerLink="/">CineApp</a>
+
+  <nav class="nav">
+    @if (authService.usuarioActual(); as usuario) {
+      <a routerLink="/perfil">{{ usuario.nombre }}</a>
+      <button type="button" (click)="cerrarSesion()">Cerrar sesión</button>
+    } @else {
+      <a routerLink="/login">Iniciar sesión</a>
+      <a routerLink="/registro">Registrarse</a>
+    }
+  </nav>
 </header>
