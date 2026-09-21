@@ -17,6 +17,7 @@ export class SalasAdmin {
   protected readonly salas = signal<Sala[]>([]);
   protected readonly cargando = signal(true);
   protected readonly creando = signal(false);
+  protected readonly error = signal('');
 
   protected readonly form = this.fb.group({
     nombre: ['', Validators.required],
@@ -32,17 +33,26 @@ export class SalasAdmin {
   }
 
   async crear(): Promise<void> {
+    this.error.set('');
+
     if (this.form.invalid) {
       this.form.markAllAsTouched();
+      this.error.set('Ingresá un nombre para la sala.');
       return;
     }
 
     this.creando.set(true);
     const { nombre } = this.form.getRawValue();
-    await this.salasService.crear(nombre!);
-    this.form.reset();
-    await this.cargar();
-    this.creando.set(false);
+
+    try {
+      await this.salasService.crear(nombre!);
+      this.form.reset();
+      await this.cargar();
+    } catch (err) {
+      this.error.set(err instanceof Error ? err.message : 'No se pudo crear la sala.');
+    } finally {
+      this.creando.set(false);
+    }
   }
 
   async alternarActiva(sala: Sala): Promise<void> {

@@ -35,6 +35,18 @@ button:disabled {
   cursor: not-allowed;
 }
 
+.mensaje {
+  margin: 0 0 var(--space-4);
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-sm);
+  font-size: 0.9rem;
+}
+
+.mensaje--error {
+  background: color-mix(in srgb, var(--color-danger) 20%, transparent);
+  color: var(--color-danger);
+}
+
 table {
   width: 100%;
   border-collapse: collapse;
