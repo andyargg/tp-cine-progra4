@@ -1,21 +1,44 @@
 <section class="hero">
   <h1>Bienvenido a CineApp</h1>
-  <p>Sprint 0 - Setup de Angular + Supabase.</p>
-
-  @switch (estado()) {
-    @case ('cargando') {
-      <p class="estado estado--cargando">Conectando con Supabase...</p>
-    }
-    @case ('ok') {
-      <p class="estado estado--ok">
-        Conexión con Supabase OK ({{ configuracion().length }} parámetros de
-        configuración leídos).
-      </p>
-    }
-    @case ('error') {
-      <p class="estado estado--error">
-        No se pudo conectar con Supabase. Revisá la consola del navegador.
-      </p>
-    }
-  }
+  <p>Elegí tu película y reservá tu entrada.</p>
+  <a routerLink="/peliculas" class="boton">Ver cartelera</a>
 </section>
+
+@if (!cargando()) {
+  <section class="seccion">
+    <h2>Más vendidas</h2>
+    @if (masVendidas().length === 0) {
+      <p class="vacio">Todavía no hay películas cargadas.</p>
+    } @else {
+      <div class="grilla">
+        @for (pelicula of masVendidas(); track pelicula.id) {
+          <article class="tarjeta">
+            @if (pelicula.imagen_url) {
+              <img [src]="pelicula.imagen_url" [alt]="pelicula.nombre" />
+            }
+            <h3>{{ pelicula.nombre }}</h3>
+          </article>
+        }
+      </div>
+    }
+  </section>
+
+  <section class="seccion">
+    <h2>Próximamente</h2>
+    @if (proximamente().length === 0) {
+      <p class="vacio">No hay estrenos programados todavía.</p>
+    } @else {
+      <div class="grilla">
+        @for (pelicula of proximamente(); track pelicula.id) {
+          <article class="tarjeta">
+            @if (pelicula.imagen_url) {
+              <img [src]="pelicula.imagen_url" [alt]="pelicula.nombre" />
+            }
+            <h3>{{ pelicula.nombre }}</h3>
+            <p class="tarjeta__meta">Estreno: {{ pelicula.estreno_fecha }}</p>
+          </article>
+        }
+      </div>
+    }
+  </section>
+}

@@ -1,0 +1,43 @@
+<section class="admin">
+  <h1>Salas</h1>
+
+  <form [formGroup]="form" (ngSubmit)="crear()" novalidate class="alta">
+    <input type="text" formControlName="nombre" placeholder="Nombre de la sala" />
+    <button type="submit" [disabled]="creando()">
+      @if (creando()) {
+        Creando...
+      } @else {
+        Crear sala (518 butacas)
+      }
+    </button>
+  </form>
+
+  @if (cargando()) {
+    <p>Cargando...</p>
+  } @else if (salas().length === 0) {
+    <p>Todavía no hay salas cargadas.</p>
+  } @else {
+    <table>
+      <thead>
+        <tr>
+          <th>Nombre</th>
+          <th>Estado</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (sala of salas(); track sala.id) {
+          <tr>
+            <td>{{ sala.nombre }}</td>
+            <td>{{ sala.activa ? 'Activa' : 'Inactiva' }}</td>
+            <td>
+              <button type="button" (click)="alternarActiva(sala)">
+                {{ sala.activa ? 'Desactivar' : 'Activar' }}
+              </button>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  }
+</section>

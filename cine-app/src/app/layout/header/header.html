@@ -2,7 +2,13 @@
   <a class="brand" routerLink="/">CineApp</a>
 
   <nav class="nav">
+    <a routerLink="/peliculas">Cartelera</a>
+
     @if (authService.usuarioActual(); as usuario) {
+      @if (usuario.rol === 'admin') {
+        <a routerLink="/admin/peliculas">Admin películas</a>
+        <a routerLink="/admin/salas">Admin salas</a>
+      }
       <a routerLink="/perfil">{{ usuario.nombre }}</a>
       <button type="button" (click)="cerrarSesion()">Cerrar sesión</button>
     } @else {

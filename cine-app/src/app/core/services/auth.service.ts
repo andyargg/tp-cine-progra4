@@ -37,7 +37,10 @@ export class AuthService {
     return this.supabaseService.client.auth.signUp({
       email,
       password,
-      options: { data: { nombre, apellido, fecha_nacimiento: fechaNacimiento } },
+      options: {
+        data: { nombre, apellido, fecha_nacimiento: fechaNacimiento },
+        emailRedirectTo: window.location.origin,
+      },
     });
   }
 
@@ -50,7 +53,9 @@ export class AuthService {
   }
 
   async recuperarContrasena(email: string) {
-    return this.supabaseService.client.auth.resetPasswordForEmail(email);
+    return this.supabaseService.client.auth.resetPasswordForEmail(email, {
+      redirectTo: window.location.origin,
+    });
   }
 
   async refrescarUsuarioActual(): Promise<void> {

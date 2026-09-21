@@ -1,0 +1,76 @@
+<section class="form-card">
+  <h1>{{ esEdicion() ? 'Editar película' : 'Nueva película' }}</h1>
+
+  @if (cargando()) {
+    <p>Cargando...</p>
+  } @else {
+    <form [formGroup]="form" (ngSubmit)="guardar()" novalidate>
+      <label>
+        Nombre
+        <input type="text" formControlName="nombre" />
+      </label>
+
+      <label>
+        URL de imagen
+        <input type="text" formControlName="imagen_url" placeholder="https://..." />
+      </label>
+
+      <label>
+        Sinopsis
+        <textarea formControlName="sinopsis" rows="3"></textarea>
+      </label>
+
+      <label>
+        Duración (minutos)
+        <input type="number" formControlName="duracion_minutos" min="1" />
+      </label>
+
+      <label>
+        Formato
+        <select formControlName="formato">
+          <option value="2D">2D</option>
+          <option value="3D">3D</option>
+          <option value="4D">4D</option>
+          <option value="5D">5D</option>
+        </select>
+      </label>
+
+      <label>
+        Idioma
+        <input type="text" formControlName="idioma" />
+      </label>
+
+      <label>
+        Restricción de edad
+        <select formControlName="restriccion_edad">
+          <option [value]="0">Sin restricción</option>
+          <option [value]="13">+13</option>
+          <option [value]="18">+18</option>
+        </select>
+      </label>
+
+      <label>
+        Fecha de estreno
+        <input type="date" formControlName="estreno_fecha" />
+      </label>
+
+      <fieldset formArrayName="generos">
+        <legend>Géneros</legend>
+        @for (genero of generos(); track genero.id; let i = $index) {
+          <label class="checkbox">
+            <input type="checkbox" [formControlName]="i" />
+            {{ genero.nombre }}
+          </label>
+        }
+      </fieldset>
+
+      <button type="submit" [disabled]="guardando()">
+        @if (guardando()) {
+          Guardando...
+        } @else {
+          Guardar
+        }
+      </button>
+    </form>
+  }
+</section>

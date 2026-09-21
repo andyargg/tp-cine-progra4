@@ -1,0 +1,47 @@
+<section class="catalogo">
+  <h1>Cartelera</h1>
+
+  <div class="filtros">
+    <input
+      type="search"
+      placeholder="Buscar por nombre..."
+      [(ngModel)]="busqueda"
+      name="busqueda"
+    />
+
+    <select [(ngModel)]="generoSeleccionado" name="genero">
+      <option [ngValue]="null">Todos los géneros</option>
+      @for (genero of generos(); track genero.id) {
+        <option [ngValue]="genero.id">{{ genero.nombre }}</option>
+      }
+    </select>
+  </div>
+
+  @if (cargando()) {
+    <p>Cargando cartelera...</p>
+  } @else if (peliculasFiltradas().length === 0) {
+    <p>No se encontraron películas con esos filtros.</p>
+  } @else {
+    <div class="grilla">
+      @for (pelicula of peliculasFiltradas(); track pelicula.id) {
+        <article class="tarjeta">
+          @if (pelicula.imagen_url) {
+            <img [src]="pelicula.imagen_url" [alt]="pelicula.nombre" />
+          }
+          <h2>{{ pelicula.nombre }}</h2>
+          <p class="tarjeta__meta">
+            {{ pelicula.formato }} · {{ pelicula.idioma }} · {{ pelicula.duracion_minutos }} min
+          </p>
+          @if (pelicula.restriccion_edad > 0) {
+            <p class="tarjeta__restriccion">+{{ pelicula.restriccion_edad }}</p>
+          }
+          <p class="tarjeta__generos">
+            @for (genero of pelicula.generos; track genero.id) {
+              <span class="chip">{{ genero.nombre }}</span>
+            }
+          </p>
+        </article>
+      }
+    </div>
+  }
+</section>
