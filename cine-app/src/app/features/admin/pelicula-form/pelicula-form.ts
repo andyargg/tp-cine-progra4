@@ -7,6 +7,7 @@ import {
 } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { PeliculasService } from '../../../core/services/peliculas.service';
+import { ToastService } from '../../../core/services/toast.service';
 import { FormatoPelicula, Genero } from '../../../core/models/database.types';
 
 @Component({
@@ -21,6 +22,7 @@ export class PeliculaForm {
   private readonly peliculasService = inject(PeliculasService);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
+  private readonly toastService = inject(ToastService);
 
   protected readonly generos = signal<Genero[]>([]);
   protected readonly cargando = signal(true);
@@ -86,6 +88,7 @@ export class PeliculaForm {
   async guardar(): Promise<void> {
     if (this.form.invalid) {
       this.form.markAllAsTouched();
+      this.toastService.error('Revisá los campos del formulario.');
       return;
     }
 
@@ -107,12 +110,20 @@ export class PeliculaForm {
       estreno_fecha: valores.estreno_fecha || null,
     };
 
-    if (this.peliculaId) {
-      await this.peliculasService.actualizar(this.peliculaId, datos, generoIds);
-    } else {
-      await this.peliculasService.crear(datos, generoIds);
-    }
+    try {
+      if (this.peliculaId) {
+        await this.peliculasService.actualizar(this.peliculaId, datos, generoIds);
+      } else {
+        await this.peliculasService.crear(datos, generoIds);
+      }
 
-    this.router.navigateByUrl('/admin/peliculas');
+      this.toastService.exito(`"${datos.nombre}" guardada.`);
+      this.router.navigateByUrl('/admin/peliculas');
+    } catch (err) {
+      this.toastService.error(
+        err instanceof Error ? err.message : 'No se pudo guardar la película.',
+      );
+      this.guardando.set(false);
+    }
   }
 }

@@ -1,6 +1,7 @@
 import { Component, inject, signal } from '@angular/core';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { SalasService } from '../../../core/services/salas.service';
+import { ToastService } from '../../../core/services/toast.service';
 import { Sala } from '../../../core/models/database.types';
 
 @Component({
@@ -13,11 +14,11 @@ import { Sala } from '../../../core/models/database.types';
 export class SalasAdmin {
   private readonly fb = inject(FormBuilder);
   private readonly salasService = inject(SalasService);
+  private readonly toastService = inject(ToastService);
 
   protected readonly salas = signal<Sala[]>([]);
   protected readonly cargando = signal(true);
   protected readonly creando = signal(false);
-  protected readonly error = signal('');
 
   protected readonly form = this.fb.group({
     nombre: ['', Validators.required],
@@ -33,11 +34,9 @@ export class SalasAdmin {
   }
 
   async crear(): Promise<void> {
-    this.error.set('');
-
     if (this.form.invalid) {
       this.form.markAllAsTouched();
-      this.error.set('Ingresá un nombre para la sala.');
+      this.toastService.error('Ingresá un nombre para la sala.');
       return;
     }
 
@@ -48,15 +47,22 @@ export class SalasAdmin {
       await this.salasService.crear(nombre!);
       this.form.reset();
       await this.cargar();
+      this.toastService.exito(`Sala "${nombre}" creada con 518 butacas.`);
     } catch (err) {
-      this.error.set(err instanceof Error ? err.message : 'No se pudo crear la sala.');
+      this.toastService.error(err instanceof Error ? err.message : 'No se pudo crear la sala.');
     } finally {
       this.creando.set(false);
     }
   }
 
   async alternarActiva(sala: Sala): Promise<void> {
-    await this.salasService.cambiarActiva(sala.id, !sala.activa);
-    await this.cargar();
+    try {
+      await this.salasService.cambiarActiva(sala.id, !sala.activa);
+      await this.cargar();
+    } catch (err) {
+      this.toastService.error(
+        err instanceof Error ? err.message : 'No se pudo actualizar la sala.',
+      );
+    }
   }
 }
