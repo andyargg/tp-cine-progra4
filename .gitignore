@@ -7,3 +7,6 @@ Thumbs.db
 
 # Vercel CLI local link (contiene IDs de proyecto, no secretos, pero es local)
 .vercel
+
+# Notas personales de decisiones tecnicas (consulta propia, no se pushea)
+decisiones-tecnicas.md
