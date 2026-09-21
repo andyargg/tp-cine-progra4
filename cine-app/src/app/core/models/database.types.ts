@@ -60,3 +60,14 @@ export interface Butaca {
   columna: number;
   tipo: TipoButaca;
 }
+
+export interface Funcion {
+  id: string;
+  pelicula_id: string;
+  sala_id: string;
+  inicio: string;
+  fin: string;
+  precio_base: number;
+  publicada: boolean;
+  created_at: string;
+}

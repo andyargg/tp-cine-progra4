@@ -1,0 +1,80 @@
+<section class="admin">
+  <h1>Funciones</h1>
+
+  <form [formGroup]="form" (ngSubmit)="crear()" novalidate class="form-card">
+    <label>
+      Película
+      <select formControlName="peliculaId">
+        <option value="" disabled>Elegí una película</option>
+        @for (pelicula of peliculas(); track pelicula.id) {
+          <option [value]="pelicula.id">{{ pelicula.nombre }}</option>
+        }
+      </select>
+    </label>
+
+    <fieldset formArrayName="dias">
+      <legend>Días</legend>
+      @for (dia of diasSemana; track dia.valor; let i = $index) {
+        <label class="checkbox">
+          <input type="checkbox" [formControlName]="i" />
+          {{ dia.label }}
+        </label>
+      }
+    </fieldset>
+
+    <label>
+      Hora
+      <input type="time" formControlName="hora" />
+    </label>
+
+    <label>
+      Desde
+      <input type="date" formControlName="desde" />
+    </label>
+
+    <label>
+      Hasta
+      <input type="date" formControlName="hasta" />
+    </label>
+
+    <label>
+      Precio base
+      <input type="number" formControlName="precioBase" min="1" />
+    </label>
+
+    <button type="submit" [disabled]="creando()">
+      @if (creando()) {
+        Creando...
+      } @else {
+        Crear funciones
+      }
+    </button>
+  </form>
+
+  <h2>Próximas funciones</h2>
+
+  @if (cargando()) {
+    <p>Cargando...</p>
+  } @else if (proximas().length === 0) {
+    <p>No hay funciones programadas.</p>
+  } @else {
+    <table>
+      <thead>
+        <tr>
+          <th>Película</th>
+          <th>Inicio</th>
+          <th>Precio</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (funcion of proximas(); track funcion.id) {
+          <tr>
+            <td>{{ nombrePelicula(funcion.pelicula_id) }}</td>
+            <td>{{ funcion.inicio | date: 'EEE d/M HH:mm' }}</td>
+            <td>${{ funcion.precio_base }}</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  }
+</section>

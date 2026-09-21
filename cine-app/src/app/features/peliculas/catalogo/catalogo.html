@@ -42,6 +42,20 @@
               <span class="chip">{{ genero.nombre }}</span>
             }
           </p>
+
+          @if (horariosDe(pelicula.id).length === 0) {
+            <p class="tarjeta__sin-horarios">Sin funciones programadas</p>
+          } @else {
+            <ul class="horarios">
+              @for (horario of horariosDe(pelicula.id); track horario.funcion.id) {
+                <li>
+                  {{ horario.funcion.inicio | date: 'EEE d/M HH:mm' }} · ${{
+                    horario.precioVigente
+                  }}
+                </li>
+              }
+            </ul>
+          }
         </article>
       }
     </div>

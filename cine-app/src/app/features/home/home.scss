@@ -69,3 +69,14 @@
   font-size: 0.85rem;
   margin: var(--space-1) 0 0;
 }
+
+.tarjeta button {
+  margin-top: var(--space-2);
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--color-border);
+  background: transparent;
+  color: var(--color-text);
+  font-size: 0.8rem;
+  cursor: pointer;
+}

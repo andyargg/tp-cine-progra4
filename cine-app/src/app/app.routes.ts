@@ -49,6 +49,12 @@ export const routes: Routes = [
     canActivate: [rolGuard(['admin'])],
   },
   {
+    path: 'admin/funciones',
+    loadComponent: () =>
+      import('./features/admin/funciones-admin/funciones-admin').then((m) => m.FuncionesAdmin),
+    canActivate: [rolGuard(['admin'])],
+  },
+  {
     path: '**',
     redirectTo: '',
   },

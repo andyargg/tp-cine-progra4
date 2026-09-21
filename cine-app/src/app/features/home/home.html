@@ -40,6 +40,11 @@
             }
             <h3>{{ pelicula.nombre }}</h3>
             <p class="tarjeta__meta">Estreno: {{ pelicula.estreno_fecha }}</p>
+            @if (authService.usuarioActual()) {
+              <button type="button" (click)="alternarAlerta(pelicula.id, pelicula.nombre)">
+                {{ suscripciones().has(pelicula.id) ? 'Avisándote ✓' : 'Avisarme' }}
+              </button>
+            }
           </article>
         }
       </div>
