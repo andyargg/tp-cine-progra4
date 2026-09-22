@@ -8,6 +8,7 @@ import {
 import { ActivatedRoute, Router } from '@angular/router';
 import { PeliculasService } from '../../../core/services/peliculas.service';
 import { ToastService } from '../../../core/services/toast.service';
+import { mensajeDeError } from '../../../core/utils/error.util';
 import { FormatoPelicula, Genero } from '../../../core/models/database.types';
 
 @Component({
@@ -121,7 +122,7 @@ export class PeliculaForm {
       this.router.navigateByUrl('/admin/peliculas');
     } catch (err) {
       this.toastService.error(
-        err instanceof Error ? err.message : 'No se pudo guardar la película.',
+        mensajeDeError(err, 'No se pudo guardar la película.'),
       );
       this.guardando.set(false);
     }

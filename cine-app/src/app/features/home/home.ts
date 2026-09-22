@@ -4,6 +4,7 @@ import { PeliculasService } from '../../core/services/peliculas.service';
 import { AlertasService } from '../../core/services/alertas.service';
 import { AuthService } from '../../core/services/auth.service';
 import { ToastService } from '../../core/services/toast.service';
+import { mensajeDeError } from '../../core/utils/error.util';
 import { PeliculaConGeneros } from '../../core/models/database.types';
 
 @Component({
@@ -63,7 +64,7 @@ export class Home {
       }
       this.suscripciones.set(nuevasSuscripciones);
     } catch (err) {
-      this.toastService.error(err instanceof Error ? err.message : 'No se pudo procesar la alerta.');
+      this.toastService.error(mensajeDeError(err, 'No se pudo procesar la alerta.'));
     }
   }
 }

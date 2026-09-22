@@ -5,6 +5,7 @@ import { PeliculasService } from '../../../core/services/peliculas.service';
 import { FuncionesService } from '../../../core/services/funciones.service';
 import { SalasService } from '../../../core/services/salas.service';
 import { ToastService } from '../../../core/services/toast.service';
+import { mensajeDeError } from '../../../core/utils/error.util';
 import { Funcion, PeliculaConGeneros, Sala } from '../../../core/models/database.types';
 
 interface DiaSemana {
@@ -120,7 +121,7 @@ export class FuncionesAdmin {
       await this.cargar();
     } catch (err) {
       this.toastService.error(
-        err instanceof Error ? err.message : 'No se pudieron crear las funciones.',
+        mensajeDeError(err, 'No se pudieron crear las funciones.'),
       );
     } finally {
       this.creando.set(false);

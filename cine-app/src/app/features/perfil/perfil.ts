@@ -11,6 +11,7 @@ import { ButacasService } from '../../core/services/butacas.service';
 import { ToastService } from '../../core/services/toast.service';
 import { calcularEdad } from '../../core/utils/edad.util';
 import { generarEntradaPdf } from '../../core/utils/entrada-pdf.util';
+import { mensajeDeError } from '../../core/utils/error.util';
 import { Compra } from '../../core/models/database.types';
 
 type EstadoGuardado = 'inicial' | 'guardando' | 'guardado' | 'error';
@@ -90,7 +91,7 @@ export class Perfil {
       this.toastService.exito('Compra cancelada, el crédito ya está disponible en tu cuenta.');
       await Promise.all([this.cargarCompras(), this.authService.refrescarUsuarioActual()]);
     } catch (err) {
-      this.toastService.error(err instanceof Error ? err.message : 'No se pudo cancelar la compra.');
+      this.toastService.error(mensajeDeError(err, 'No se pudo cancelar la compra.'));
     } finally {
       this.cancelando.set(null);
     }
@@ -125,7 +126,7 @@ export class Perfil {
         total: compra.total,
       });
     } catch (err) {
-      this.toastService.error(err instanceof Error ? err.message : 'No se pudo generar el PDF.');
+      this.toastService.error(mensajeDeError(err, 'No se pudo generar el PDF.'));
     }
   }
 }

@@ -12,6 +12,7 @@ import { SupabaseService } from '../../../core/services/supabase.service';
 import { ToastService } from '../../../core/services/toast.service';
 import { calcularPrecioVigente } from '../../../core/utils/funciones.util';
 import { generarEntradaPdf } from '../../../core/utils/entrada-pdf.util';
+import { mensajeDeError } from '../../../core/utils/error.util';
 import { Butaca, Funcion, PeliculaConGeneros, Sala } from '../../../core/models/database.types';
 
 interface CompraConfirmada {
@@ -132,7 +133,7 @@ export class SeleccionButacas implements OnDestroy {
         await this.butacasService.reservar(this.funcionId, butaca.id, this.sessionId);
       }
     } catch (err) {
-      this.toastService.error(err instanceof Error ? err.message : 'No se pudo actualizar la butaca.');
+      this.toastService.error(mensajeDeError(err, 'No se pudo actualizar la butaca.'));
     }
   }
 
@@ -160,7 +161,7 @@ export class SeleccionButacas implements OnDestroy {
       await this.descargarPdf();
       this.toastService.exito('¡Compra confirmada! Descargamos tu entrada en PDF.');
     } catch (err) {
-      this.toastService.error(err instanceof Error ? err.message : 'No se pudo confirmar la compra.');
+      this.toastService.error(mensajeDeError(err, 'No se pudo confirmar la compra.'));
     } finally {
       this.procesando.set(false);
     }
@@ -214,6 +215,12 @@ export class SeleccionButacas implements OnDestroy {
           new Date(),
         ),
       );
+
+      if (pelicula.restriccion_edad > 0) {
+        this.toastService.info(
+          `Esta función es +${pelicula.restriccion_edad}. Los menores deben ir acompañados de un adulto.`,
+        );
+      }
     }
 
     if (sala) {

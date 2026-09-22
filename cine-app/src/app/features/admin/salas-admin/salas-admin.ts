@@ -2,6 +2,7 @@ import { Component, inject, signal } from '@angular/core';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { SalasService } from '../../../core/services/salas.service';
 import { ToastService } from '../../../core/services/toast.service';
+import { mensajeDeError } from '../../../core/utils/error.util';
 import { Sala } from '../../../core/models/database.types';
 
 @Component({
@@ -49,7 +50,7 @@ export class SalasAdmin {
       await this.cargar();
       this.toastService.exito(`Sala "${nombre}" creada con 518 butacas.`);
     } catch (err) {
-      this.toastService.error(err instanceof Error ? err.message : 'No se pudo crear la sala.');
+      this.toastService.error(mensajeDeError(err, 'No se pudo crear la sala.'));
     } finally {
       this.creando.set(false);
     }
@@ -61,7 +62,7 @@ export class SalasAdmin {
       await this.cargar();
     } catch (err) {
       this.toastService.error(
-        err instanceof Error ? err.message : 'No se pudo actualizar la sala.',
+        mensajeDeError(err, 'No se pudo actualizar la sala.'),
       );
     }
   }
