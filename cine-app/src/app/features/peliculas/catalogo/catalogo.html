@@ -49,9 +49,8 @@
             <ul class="horarios">
               @for (horario of horariosDe(pelicula.id); track horario.funcion.id) {
                 <li>
-                  {{ horario.funcion.inicio | date: 'EEE d/M HH:mm' }} · ${{
-                    horario.precioVigente
-                  }}
+                  {{ horario.funcion.inicio | date: 'EEE d/M HH:mm' }} · {{ horario.nombreSala }} ·
+                  ${{ horario.precioVigente }}
                 </li>
               }
             </ul>

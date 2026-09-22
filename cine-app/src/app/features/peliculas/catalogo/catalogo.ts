@@ -3,12 +3,14 @@ import { FormsModule } from '@angular/forms';
 import { DatePipe } from '@angular/common';
 import { PeliculasService } from '../../../core/services/peliculas.service';
 import { FuncionesService } from '../../../core/services/funciones.service';
+import { SalasService } from '../../../core/services/salas.service';
 import { calcularPrecioVigente } from '../../../core/utils/funciones.util';
 import { Funcion, Genero, PeliculaConGeneros } from '../../../core/models/database.types';
 
 interface HorarioMostrado {
   funcion: Funcion;
   precioVigente: number;
+  nombreSala: string;
 }
 
 @Component({
@@ -21,6 +23,7 @@ interface HorarioMostrado {
 export class Catalogo {
   private readonly peliculasService = inject(PeliculasService);
   private readonly funcionesService = inject(FuncionesService);
+  private readonly salasService = inject(SalasService);
 
   protected readonly peliculas = signal<PeliculaConGeneros[]>([]);
   protected readonly generos = signal<Genero[]>([]);
@@ -50,9 +53,10 @@ export class Catalogo {
   }
 
   private async cargar(): Promise<void> {
-    const [peliculas, generos] = await Promise.all([
+    const [peliculas, generos, salas] = await Promise.all([
       this.peliculasService.listarActivas(),
       this.peliculasService.listarGeneros(),
+      this.salasService.listar(),
     ]);
 
     this.peliculas.set(peliculas);
@@ -74,9 +78,10 @@ export class Catalogo {
         pelicula?.estreno_fecha ?? null,
         ahora,
       );
+      const nombreSala = salas.find((s) => s.id === funcion.sala_id)?.nombre ?? '';
 
       const lista = mapa.get(funcion.pelicula_id) ?? [];
-      lista.push({ funcion, precioVigente });
+      lista.push({ funcion, precioVigente, nombreSala });
       mapa.set(funcion.pelicula_id, lista);
     }
 
