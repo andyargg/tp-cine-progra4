@@ -1,6 +1,7 @@
 import { Component, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { DatePipe } from '@angular/common';
+import { RouterLink } from '@angular/router';
 import { PeliculasService } from '../../../core/services/peliculas.service';
 import { FuncionesService } from '../../../core/services/funciones.service';
 import { SalasService } from '../../../core/services/salas.service';
@@ -16,7 +17,7 @@ interface HorarioMostrado {
 @Component({
   selector: 'app-catalogo',
   standalone: true,
-  imports: [FormsModule, DatePipe],
+  imports: [FormsModule, DatePipe, RouterLink],
   templateUrl: './catalogo.html',
   styleUrl: './catalogo.scss',
 })

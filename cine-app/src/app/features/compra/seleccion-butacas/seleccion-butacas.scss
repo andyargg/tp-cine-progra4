@@ -1,0 +1,170 @@
+.compra {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: var(--space-5) var(--space-4);
+}
+
+.encabezado {
+  margin-bottom: var(--space-4);
+}
+
+.aviso-edad {
+  color: var(--color-danger);
+  font-size: 0.85rem;
+}
+
+.leyenda {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  margin-bottom: var(--space-4);
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
+}
+
+.leyenda__item {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.leyenda__item i {
+  width: 0.9rem;
+  height: 0.9rem;
+  border-radius: var(--radius-sm);
+  display: inline-block;
+}
+
+i.normal {
+  background: var(--color-surface);
+}
+i.accesible {
+  background: var(--color-info);
+}
+i.vip {
+  background: var(--color-primary);
+}
+i.seleccionada {
+  background: var(--color-success);
+}
+i.ocupada {
+  background: var(--color-danger);
+  opacity: 0.5;
+}
+i.vendida {
+  background: var(--color-border);
+}
+
+.mapa {
+  overflow-x: auto;
+  margin-bottom: var(--space-5);
+  padding-bottom: var(--space-2);
+}
+
+.fila {
+  display: flex;
+  align-items: center;
+  gap: 0.2rem;
+  margin-bottom: 0.2rem;
+}
+
+.fila__label {
+  width: 1.5rem;
+  color: var(--color-text-muted);
+  font-size: 0.75rem;
+  flex-shrink: 0;
+}
+
+.butaca {
+  width: 1.6rem;
+  height: 1.6rem;
+  flex-shrink: 0;
+  border-radius: 0.25rem;
+  border: none;
+  font-size: 0.65rem;
+  color: var(--color-text);
+  cursor: pointer;
+  background: var(--color-surface);
+}
+
+.butaca--accesible {
+  background: var(--color-info);
+}
+
+.butaca--vip {
+  background: var(--color-primary);
+  color: var(--color-primary-contrast);
+}
+
+.butaca--seleccionada {
+  background: var(--color-success);
+  color: var(--color-bg);
+}
+
+.butaca--ocupada {
+  background: var(--color-danger);
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.butaca--vendida {
+  background: var(--color-border);
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.resumen {
+  background: var(--color-surface);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.checkbox {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.total {
+  font-size: 1.2rem;
+  font-weight: 600;
+}
+
+button {
+  align-self: flex-start;
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-sm);
+  border: none;
+  background: var(--color-primary);
+  color: var(--color-primary-contrast);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.confirmacion {
+  text-align: center;
+  background: var(--color-surface);
+  border-radius: var(--radius-lg);
+  padding: var(--space-5);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.chip {
+  padding: 0.1rem var(--space-2);
+  border-radius: var(--radius-lg);
+  background: var(--color-bg);
+  color: var(--color-text-muted);
+  font-size: 0.8rem;
+  margin: 0 0.2rem;
+}

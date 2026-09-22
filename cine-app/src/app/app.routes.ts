@@ -20,6 +20,13 @@ export const routes: Routes = [
     loadComponent: () => import('./features/auth/login/login').then((m) => m.Login),
   },
   {
+    path: 'funciones/:funcionId/butacas',
+    loadComponent: () =>
+      import('./features/compra/seleccion-butacas/seleccion-butacas').then(
+        (m) => m.SeleccionButacas,
+      ),
+  },
+  {
     path: 'perfil',
     loadComponent: () => import('./features/perfil/perfil').then((m) => m.Perfil),
     canActivate: [authGuard],

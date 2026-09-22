@@ -80,3 +80,64 @@ button:disabled {
   background: color-mix(in srgb, var(--color-danger) 20%, transparent);
   color: var(--color-danger);
 }
+
+h2 {
+  margin-top: var(--space-6);
+}
+
+.vacio {
+  color: var(--color-text-muted);
+}
+
+.compras {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.compra {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3);
+  background: var(--color-surface);
+  border-radius: var(--radius-md);
+  flex-wrap: wrap;
+}
+
+.compra__estado {
+  margin-left: var(--space-2);
+  padding: 0.1rem var(--space-2);
+  border-radius: var(--radius-sm);
+  font-size: 0.75rem;
+}
+
+.compra__estado--confirmada {
+  background: color-mix(in srgb, var(--color-success) 20%, transparent);
+  color: var(--color-success);
+}
+
+.compra__estado--cancelada {
+  background: color-mix(in srgb, var(--color-danger) 20%, transparent);
+  color: var(--color-danger);
+}
+
+.compra__fecha {
+  margin-left: var(--space-2);
+  color: var(--color-text-muted);
+  font-size: 0.85rem;
+}
+
+.compra__acciones {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.compra__acciones button {
+  padding: var(--space-1) var(--space-2);
+  font-size: 0.85rem;
+}

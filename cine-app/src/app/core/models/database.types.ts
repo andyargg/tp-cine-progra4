@@ -71,3 +71,30 @@ export interface Funcion {
   publicada: boolean;
   created_at: string;
 }
+
+export interface Compra {
+  id: string;
+  usuario_id: string | null;
+  estado: EstadoCompra;
+  cupon_id: string | null;
+  credito_usado: number;
+  total: number;
+  qr_codigo: string | null;
+  created_at: string;
+}
+
+export interface Entrada {
+  id: string;
+  compra_id: string;
+  funcion_id: string;
+  butaca_id: string;
+  precio: number;
+  estado: EstadoEntrada;
+}
+
+export interface ButacaReservadaTemp {
+  funcion_id: string;
+  butaca_id: string;
+  session_id: string;
+  expires_at: string;
+}

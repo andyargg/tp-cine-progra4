@@ -1,0 +1,92 @@
+<section class="compra">
+  @if (cargando()) {
+    <p>Cargando...</p>
+  } @else if (compraConfirmada(); as compra) {
+    <div class="confirmacion">
+      <h1>¡Compra confirmada!</h1>
+      <p>Total pagado: ${{ compra.total }}</p>
+      <p>
+        Butacas:
+        @for (b of compra.butacas; track b.fila + b.columna) {
+          <span class="chip">{{ b.fila }}{{ b.columna }}</span>
+        }
+      </p>
+      <button type="button" (click)="descargarPdf()">Descargar entrada (PDF)</button>
+      <a routerLink="/peliculas">Volver a la cartelera</a>
+    </div>
+  } @else {
+    <header class="encabezado">
+      <h1>{{ pelicula()?.nombre }}</h1>
+      <p>{{ funcion()?.inicio | date: 'EEEE d/M HH:mm' }} · {{ sala()?.nombre }}</p>
+      @if (pelicula() && pelicula()!.restriccion_edad > 0) {
+        <p class="aviso-edad">
+          Función +{{ pelicula()!.restriccion_edad }}. Menores deben ir acompañados de un adulto.
+        </p>
+      }
+    </header>
+
+    <div class="leyenda">
+      <span class="leyenda__item"><i class="normal"></i> Normal</span>
+      <span class="leyenda__item"><i class="accesible"></i> Accesible</span>
+      <span class="leyenda__item"><i class="vip"></i> VIP</span>
+      <span class="leyenda__item"><i class="seleccionada"></i> Tu selección</span>
+      <span class="leyenda__item"><i class="ocupada"></i> Ocupada ahora</span>
+      <span class="leyenda__item"><i class="vendida"></i> Vendida</span>
+    </div>
+
+    <div class="mapa">
+      @for (fila of filas(); track fila[0]) {
+        <div class="fila">
+          <span class="fila__label">{{ fila[0] }}</span>
+          @for (butaca of fila[1]; track butaca.id) {
+            <button
+              type="button"
+              class="butaca butaca--{{ estadoDe(butaca) }}"
+              [disabled]="estadoDe(butaca) === 'vendida' || estadoDe(butaca) === 'ocupada'"
+              (click)="toggleButaca(butaca)"
+            >
+              {{ butaca.columna }}
+            </button>
+          }
+        </div>
+      }
+    </div>
+
+    <div class="resumen">
+      <p>Butacas seleccionadas: {{ seleccionadas().size }}</p>
+      <p>Subtotal: ${{ subtotal() }}</p>
+
+      @if (puedeUsarCupon()) {
+        <label class="checkbox">
+          <input
+            type="checkbox"
+            [checked]="usarCuponBienvenida()"
+            (change)="usarCuponBienvenida.set(!usarCuponBienvenida())"
+          />
+          Usar cupón de bienvenida (-{{ porcentajeCupon() }}%)
+        </label>
+      }
+
+      @if (hayVipSeleccionada()) {
+        <label class="checkbox">
+          <input
+            type="checkbox"
+            [checked]="confirmoVip()"
+            (change)="confirmoVip.set(!confirmoVip())"
+          />
+          Confirmo que estoy comprando butaca(s) VIP a precio mayor.
+        </label>
+      }
+
+      <p class="total">Total: ${{ totalEstimado() }}</p>
+
+      <button type="button" [disabled]="!puedeConfirmar() || procesando()" (click)="confirmar()">
+        @if (procesando()) {
+          Procesando...
+        } @else {
+          Confirmar compra
+        }
+      </button>
+    </div>
+  }
+</section>

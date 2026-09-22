@@ -36,6 +36,17 @@ export class FuncionesService {
     return data ?? [];
   }
 
+  async obtenerPorId(id: string): Promise<Funcion | null> {
+    const { data, error } = await this.supabaseService.client
+      .from('funciones')
+      .select('*')
+      .eq('id', id)
+      .single();
+
+    if (error) return null;
+    return data;
+  }
+
   async listarProximas(): Promise<Funcion[]> {
     const { data, error } = await this.supabaseService.client
       .from('funciones')

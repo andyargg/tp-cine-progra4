@@ -17,6 +17,17 @@ export class SalasService {
     return data;
   }
 
+  async obtenerPorId(id: string): Promise<Sala | null> {
+    const { data, error } = await this.supabaseService.client
+      .from('salas')
+      .select('*')
+      .eq('id', id)
+      .single();
+
+    if (error) return null;
+    return data;
+  }
+
   async crear(nombre: string): Promise<string> {
     const { data, error } = await this.supabaseService.client
       .from('salas')

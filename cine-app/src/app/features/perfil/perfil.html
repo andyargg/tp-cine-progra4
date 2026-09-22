@@ -56,5 +56,37 @@
         }
       </button>
     </form>
+
+    <h2>Mis compras</h2>
+
+    @if (misCompras().length === 0) {
+      <p class="vacio">Todavía no compraste ninguna entrada.</p>
+    } @else {
+      <ul class="compras">
+        @for (compra of misCompras(); track compra.id) {
+          <li class="compra">
+            <div>
+              <strong>${{ compra.total }}</strong>
+              <span class="compra__estado compra__estado--{{ compra.estado }}">{{
+                compra.estado
+              }}</span>
+              <span class="compra__fecha">{{ compra.created_at | date: 'd/M/yy HH:mm' }}</span>
+            </div>
+            <div class="compra__acciones">
+              <button type="button" (click)="descargarEntrada(compra)">Descargar PDF</button>
+              @if (compra.estado === 'confirmada') {
+                <button
+                  type="button"
+                  [disabled]="cancelando() === compra.id"
+                  (click)="cancelar(compra)"
+                >
+                  {{ cancelando() === compra.id ? 'Cancelando...' : 'Cancelar' }}
+                </button>
+              }
+            </div>
+          </li>
+        }
+      </ul>
+    }
   }
 </section>

@@ -49,8 +49,10 @@
             <ul class="horarios">
               @for (horario of horariosDe(pelicula.id); track horario.funcion.id) {
                 <li>
-                  {{ horario.funcion.inicio | date: 'EEE d/M HH:mm' }} · {{ horario.nombreSala }} ·
-                  ${{ horario.precioVigente }}
+                  <a [routerLink]="['/funciones', horario.funcion.id, 'butacas']">
+                    {{ horario.funcion.inicio | date: 'EEE d/M HH:mm' }} · {{ horario.nombreSala }}
+                    · ${{ horario.precioVigente }}
+                  </a>
                 </li>
               }
             </ul>
