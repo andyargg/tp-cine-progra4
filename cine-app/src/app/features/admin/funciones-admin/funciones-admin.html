@@ -62,6 +62,7 @@
       <thead>
         <tr>
           <th>Película</th>
+          <th>Sala</th>
           <th>Inicio</th>
           <th>Precio</th>
         </tr>
@@ -70,6 +71,7 @@
         @for (funcion of proximas(); track funcion.id) {
           <tr>
             <td>{{ nombrePelicula(funcion.pelicula_id) }}</td>
+            <td>{{ nombreSala(funcion.sala_id) }}</td>
             <td>{{ funcion.inicio | date: 'EEE d/M HH:mm' }}</td>
             <td>${{ funcion.precio_base }}</td>
           </tr>

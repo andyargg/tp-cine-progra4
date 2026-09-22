@@ -3,8 +3,9 @@ import { ReactiveFormsModule, FormBuilder, FormControl, Validators } from '@angu
 import { DatePipe } from '@angular/common';
 import { PeliculasService } from '../../../core/services/peliculas.service';
 import { FuncionesService } from '../../../core/services/funciones.service';
+import { SalasService } from '../../../core/services/salas.service';
 import { ToastService } from '../../../core/services/toast.service';
-import { Funcion, PeliculaConGeneros } from '../../../core/models/database.types';
+import { Funcion, PeliculaConGeneros, Sala } from '../../../core/models/database.types';
 
 interface DiaSemana {
   label: string;
@@ -32,10 +33,12 @@ export class FuncionesAdmin {
   private readonly fb = inject(FormBuilder);
   private readonly peliculasService = inject(PeliculasService);
   private readonly funcionesService = inject(FuncionesService);
+  private readonly salasService = inject(SalasService);
   private readonly toastService = inject(ToastService);
 
   protected readonly diasSemana = DIAS_SEMANA;
   protected readonly peliculas = signal<PeliculaConGeneros[]>([]);
+  protected readonly salas = signal<Sala[]>([]);
   protected readonly proximas = signal<Funcion[]>([]);
   protected readonly cargando = signal(true);
   protected readonly creando = signal(false);
@@ -59,17 +62,23 @@ export class FuncionesAdmin {
     return this.peliculas().find((p) => p.id === peliculaId)?.nombre ?? '';
   }
 
+  protected nombreSala(salaId: string): string {
+    return this.salas().find((s) => s.id === salaId)?.nombre ?? '';
+  }
+
   constructor() {
     this.cargar();
   }
 
   private async cargar(): Promise<void> {
-    const [peliculas, proximas] = await Promise.all([
+    const [peliculas, salas, proximas] = await Promise.all([
       this.peliculasService.listarActivas(),
+      this.salasService.listar(),
       this.funcionesService.listarProximas(),
     ]);
 
     this.peliculas.set(peliculas);
+    this.salas.set(salas);
     this.proximas.set(proximas);
     this.cargando.set(false);
   }
