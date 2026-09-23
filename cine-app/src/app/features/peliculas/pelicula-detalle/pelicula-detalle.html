@@ -1,0 +1,120 @@
+@if (cargando()) {
+  <p class="estado-carga">Cargando...</p>
+} @else if (!pelicula()) {
+  <p class="estado-carga">No se encontró la película.</p>
+} @else {
+  <section class="ficha">
+    <div class="ficha__poster">
+      @if (pelicula()!.imagen_url) {
+        <img [src]="pelicula()!.imagen_url" [alt]="pelicula()!.nombre" />
+      } @else {
+        <div class="poster-vacio" [attr.aria-label]="pelicula()!.nombre">🎬</div>
+      }
+    </div>
+
+    <div class="ficha__info">
+      <h1>{{ pelicula()!.nombre }}</h1>
+
+      <p class="ficha__meta">
+        {{ pelicula()!.formato }} · {{ pelicula()!.idioma }} · {{ pelicula()!.duracion_minutos }}
+        min
+        @if (pelicula()!.restriccion_edad > 0) {
+          · +{{ pelicula()!.restriccion_edad }}
+        }
+      </p>
+
+      @if (promedio()) {
+        <p class="ficha__estrellas">
+          ⭐ {{ promedio()!.promedio }}/5 ({{ promedio()!.cantidad }} reseña{{
+            promedio()!.cantidad === 1 ? '' : 's'
+          }})
+        </p>
+      } @else {
+        <p class="ficha__estrellas ficha__estrellas--vacio">Todavía sin reseñas</p>
+      }
+
+      <p class="ficha__generos">
+        @for (genero of pelicula()!.generos; track genero.id) {
+          <span class="chip">{{ genero.nombre }}</span>
+        }
+      </p>
+
+      @if (pelicula()!.sinopsis) {
+        <p class="ficha__sinopsis">{{ pelicula()!.sinopsis }}</p>
+      }
+    </div>
+  </section>
+
+  <section class="horarios-seccion">
+    <h2>Horarios</h2>
+
+    @if (horarios().length === 0) {
+      <p class="vacio">Sin funciones programadas.</p>
+    } @else {
+      <ul class="horarios">
+        @for (horario of horarios(); track horario.funcion.id) {
+          <li>
+            <a [routerLink]="['/funciones', horario.funcion.id, 'butacas']">
+              {{ horario.funcion.inicio | date: 'EEE d/M HH:mm' }} · {{ horario.nombreSala }} · ${{
+                horario.precioVigente
+              }}
+            </a>
+          </li>
+        }
+      </ul>
+    }
+  </section>
+
+  <section class="resenas-seccion">
+    <h2>Reseñas</h2>
+
+    @if (puedeResenar()) {
+      <div class="form-resena">
+        <label>
+          Tu calificación
+          <select [ngModel]="estrellasNueva()" (ngModelChange)="estrellasNueva.set($event)">
+            @for (n of estrellasOpciones; track n) {
+              <option [ngValue]="n">{{ n }} ⭐</option>
+            }
+          </select>
+        </label>
+        <label>
+          Comentario (opcional)
+          <textarea
+            rows="2"
+            [ngModel]="comentarioNuevo()"
+            (ngModelChange)="comentarioNuevo.set($event)"
+          ></textarea>
+        </label>
+        <button type="button" [disabled]="enviandoResena()" (click)="enviarResena()">
+          @if (enviandoResena()) {
+            Enviando...
+          } @else {
+            Publicar reseña
+          }
+        </button>
+      </div>
+    } @else if (miResena(); as propia) {
+      <p class="mi-resena">Ya dejaste tu reseña: {{ propia.estrellas }} ⭐</p>
+    } @else if (authService.usuarioActual()) {
+      <p class="vacio">Solo podés reseñar películas que ya viste (con función pasada).</p>
+    } @else {
+      <p class="vacio">Iniciá sesión para dejar tu reseña.</p>
+    }
+
+    @if (resenas().length === 0) {
+      <p class="vacio">Todavía no hay reseñas.</p>
+    } @else {
+      <ul class="lista-resenas">
+        @for (resena of resenas(); track resena.id) {
+          <li>
+            <span class="lista-resenas__estrellas">{{ resena.estrellas }} ⭐</span>
+            @if (resena.comentario) {
+              <p>{{ resena.comentario }}</p>
+            }
+          </li>
+        }
+      </ul>
+    }
+  </section>
+}

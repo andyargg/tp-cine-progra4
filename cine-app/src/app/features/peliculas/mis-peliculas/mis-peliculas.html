@@ -1,0 +1,28 @@
+<section class="mis-peliculas">
+  <h1>Mis películas</h1>
+
+  @if (cargando()) {
+    <p>Cargando...</p>
+  } @else if (peliculas().length === 0) {
+    <p class="vacio">Todavía no viste ninguna película con nosotros.</p>
+  } @else {
+    <div class="grilla">
+      @for (item of peliculas(); track item.pelicula.id) {
+        <a class="tarjeta" [routerLink]="['/peliculas', item.pelicula.id]">
+          @if (item.pelicula.imagen_url) {
+            <img [src]="item.pelicula.imagen_url" [alt]="item.pelicula.nombre" />
+          } @else {
+            <div class="poster-vacio" [attr.aria-label]="item.pelicula.nombre">🎬</div>
+          }
+          <h2>{{ item.pelicula.nombre }}</h2>
+          <p class="tarjeta__fecha">{{ item.fecha | date: 'd/M/yy' }}</p>
+          @if (item.miResena) {
+            <p class="tarjeta__resena">Tu calificación: {{ item.miResena.estrellas }} ⭐</p>
+          } @else {
+            <p class="tarjeta__resena tarjeta__resena--pendiente">Todavía no la calificaste</p>
+          }
+        </a>
+      }
+    </div>
+  }
+</section>

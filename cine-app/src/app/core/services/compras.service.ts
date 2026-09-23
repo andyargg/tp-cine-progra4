@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { SupabaseService } from './supabase.service';
 import { AuthService } from './auth.service';
-import { Compra, CompraProducto, Entrada } from '../models/database.types';
+import { Compra, CompraProducto, Entrada, Pelicula } from '../models/database.types';
 
 export interface ItemCandyBar {
   producto_id: string | null;
@@ -84,5 +84,34 @@ export class ComprasService {
 
     if (error) throw error;
     return data ?? [];
+  }
+
+  async listarPeliculasVistas(): Promise<{ pelicula: Pelicula; fecha: string }[]> {
+    const usuario = this.authService.usuarioActual();
+    if (!usuario) return [];
+
+    const { data, error } = await this.supabaseService.client
+      .from('entradas')
+      .select('funciones!inner(inicio, peliculas(*)), compras!inner(usuario_id)')
+      .eq('compras.usuario_id', usuario.id)
+      .neq('estado', 'cancelada')
+      .lt('funciones.inicio', new Date().toISOString());
+
+    if (error) throw error;
+
+    const porPelicula = new Map<string, { pelicula: Pelicula; fecha: string }>();
+
+    for (const fila of (data ?? []) as any[]) {
+      const pelicula = fila.funciones?.peliculas as Pelicula | null;
+      const fecha = fila.funciones?.inicio as string | undefined;
+      if (!pelicula || !fecha) continue;
+
+      const existente = porPelicula.get(pelicula.id);
+      if (!existente || fecha > existente.fecha) {
+        porPelicula.set(pelicula.id, { pelicula, fecha });
+      }
+    }
+
+    return [...porPelicula.values()].sort((a, b) => b.fecha.localeCompare(a.fecha));
   }
 }

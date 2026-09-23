@@ -12,6 +12,19 @@ export const routes: Routes = [
     loadComponent: () => import('./features/peliculas/catalogo/catalogo').then((m) => m.Catalogo),
   },
   {
+    path: 'peliculas/:id',
+    loadComponent: () =>
+      import('./features/peliculas/pelicula-detalle/pelicula-detalle').then(
+        (m) => m.PeliculaDetalle,
+      ),
+  },
+  {
+    path: 'mis-peliculas',
+    loadComponent: () =>
+      import('./features/peliculas/mis-peliculas/mis-peliculas').then((m) => m.MisPeliculas),
+    canActivate: [authGuard],
+  },
+  {
     path: 'registro',
     loadComponent: () => import('./features/auth/registro/registro').then((m) => m.Registro),
   },

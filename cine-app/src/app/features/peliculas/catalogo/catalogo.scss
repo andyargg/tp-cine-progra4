@@ -39,6 +39,12 @@
   gap: var(--space-1);
 }
 
+.tarjeta__link {
+  display: block;
+  text-decoration: none;
+  color: inherit;
+}
+
 .tarjeta img {
   width: 100%;
   aspect-ratio: 2 / 3;

@@ -31,14 +31,13 @@ export class Home {
   }
 
   private async cargar(): Promise<void> {
-    const [activas, proximamente, suscripciones] = await Promise.all([
-      this.peliculasService.listarActivas(),
+    const [masVendidas, proximamente, suscripciones] = await Promise.all([
+      this.peliculasService.listarMasVendidas(3),
       this.peliculasService.listarProximamente(),
       this.alertasService.listarSuscripciones(),
     ]);
 
-    const masRecientes = [...activas].sort((a, b) => b.created_at.localeCompare(a.created_at));
-    this.masVendidas.set(masRecientes.slice(0, 3));
+    this.masVendidas.set(masVendidas);
     this.proximamente.set(proximamente);
     this.suscripciones.set(suscripciones);
     this.cargando.set(false);

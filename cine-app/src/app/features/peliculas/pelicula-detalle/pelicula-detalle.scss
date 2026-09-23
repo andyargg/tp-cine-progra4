@@ -1,0 +1,194 @@
+.estado-carga {
+  text-align: center;
+  padding: var(--space-6);
+  color: var(--color-text-muted);
+}
+
+.ficha {
+  display: flex;
+  gap: var(--space-5);
+  max-width: 900px;
+  margin: 0 auto;
+  padding: var(--space-5) var(--space-4);
+}
+
+.ficha__poster {
+  width: 220px;
+  flex-shrink: 0;
+}
+
+.ficha__poster img {
+  width: 100%;
+  aspect-ratio: 2 / 3;
+  object-fit: cover;
+  border-radius: var(--radius-md);
+}
+
+.poster-vacio {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  aspect-ratio: 2 / 3;
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  color: var(--color-text-muted);
+  font-size: 3rem;
+}
+
+.ficha__meta {
+  color: var(--color-text-muted);
+  margin: var(--space-1) 0;
+}
+
+.ficha__estrellas {
+  font-weight: 600;
+  margin: var(--space-2) 0;
+}
+
+.ficha__estrellas--vacio {
+  color: var(--color-text-muted);
+  font-weight: 400;
+}
+
+.ficha__generos {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+  margin: var(--space-2) 0;
+}
+
+.chip {
+  padding: 0.1rem var(--space-2);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+  color: var(--color-text-muted);
+  font-size: 0.75rem;
+}
+
+.ficha__sinopsis {
+  margin-top: var(--space-3);
+  line-height: 1.5;
+}
+
+.horarios-seccion,
+.resenas-seccion {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 0 var(--space-4) var(--space-5);
+}
+
+.horarios-seccion h2,
+.resenas-seccion h2 {
+  margin-bottom: var(--space-3);
+}
+
+.vacio {
+  color: var(--color-text-muted);
+}
+
+.horarios {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.horarios a {
+  display: block;
+  padding: var(--space-2) var(--space-3);
+  background: var(--color-surface);
+  border-radius: var(--radius-sm);
+  text-decoration: none;
+  color: var(--color-text);
+}
+
+.horarios a:hover {
+  background: var(--color-border);
+}
+
+.form-resena {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  background: var(--color-surface);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
+  margin-bottom: var(--space-4);
+  max-width: 420px;
+}
+
+.form-resena label {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  font-size: 0.9rem;
+  color: var(--color-text-muted);
+}
+
+.form-resena select,
+.form-resena textarea {
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--color-border);
+  background: var(--color-bg);
+  color: var(--color-text);
+  font: inherit;
+}
+
+.form-resena button {
+  align-self: flex-start;
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-sm);
+  border: none;
+  background: var(--color-primary);
+  color: var(--color-primary-contrast);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.form-resena button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.mi-resena {
+  color: var(--color-success);
+  margin-bottom: var(--space-4);
+}
+
+.lista-resenas {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.lista-resenas li {
+  background: var(--color-surface);
+  border-radius: var(--radius-sm);
+  padding: var(--space-3);
+}
+
+.lista-resenas__estrellas {
+  font-weight: 600;
+}
+
+.lista-resenas p {
+  margin: var(--space-1) 0 0;
+  color: var(--color-text-muted);
+}
+
+@media (max-width: 600px) {
+  .ficha {
+    flex-direction: column;
+  }
+
+  .ficha__poster {
+    width: 160px;
+  }
+}

@@ -25,12 +25,14 @@
     <div class="grilla">
       @for (pelicula of peliculasFiltradas(); track pelicula.id) {
         <article class="tarjeta">
-          @if (pelicula.imagen_url) {
-            <img [src]="pelicula.imagen_url" [alt]="pelicula.nombre" />
-          } @else {
-            <div class="poster-vacio" [attr.aria-label]="pelicula.nombre">🎬</div>
-          }
-          <h2>{{ pelicula.nombre }}</h2>
+          <a class="tarjeta__link" [routerLink]="['/peliculas', pelicula.id]">
+            @if (pelicula.imagen_url) {
+              <img [src]="pelicula.imagen_url" [alt]="pelicula.nombre" />
+            } @else {
+              <div class="poster-vacio" [attr.aria-label]="pelicula.nombre">🎬</div>
+            }
+            <h2>{{ pelicula.nombre }}</h2>
+          </a>
           <p class="tarjeta__meta">
             {{ pelicula.formato }} · {{ pelicula.idioma }} · {{ pelicula.duracion_minutos }} min
           </p>

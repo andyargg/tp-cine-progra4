@@ -52,6 +52,30 @@ export class PeliculasService {
     return (data ?? []).map(mapearPeliculaConGeneros);
   }
 
+  async listarMasVendidas(limite = 3): Promise<PeliculaConGeneros[]> {
+    const { data: ventas, error } = await this.supabaseService.client
+      .from('vista_ventas_por_pelicula')
+      .select('*')
+      .gt('entradas_vendidas', 0)
+      .order('entradas_vendidas', { ascending: false })
+      .limit(limite);
+
+    if (error || !ventas || ventas.length === 0) return [];
+
+    const ids = ventas.map((v) => v.pelicula_id);
+
+    const { data, error: errorPeliculas } = await this.supabaseService.client
+      .from('peliculas')
+      .select('*, peliculas_generos(generos(id, nombre))')
+      .in('id', ids)
+      .eq('activa', true);
+
+    if (errorPeliculas || !data) return [];
+
+    const mapa = new Map(data.map((p) => [p.id, mapearPeliculaConGeneros(p)]));
+    return ids.map((id) => mapa.get(id)).filter((p): p is PeliculaConGeneros => !!p);
+  }
+
   async obtenerPorId(id: string): Promise<PeliculaConGeneros | null> {
     const { data, error } = await this.supabaseService.client
       .from('peliculas')

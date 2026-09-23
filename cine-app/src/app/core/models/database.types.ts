@@ -157,3 +157,23 @@ export interface Canje {
   puntos_usados: number;
   created_at: string;
 }
+
+export interface Resena {
+  id: string;
+  usuario_id: string;
+  pelicula_id: string;
+  estrellas: number;
+  comentario: string | null;
+  created_at: string;
+}
+
+export interface ResenaPromedio {
+  pelicula_id: string;
+  promedio: number;
+  cantidad: number;
+}
+
+export interface VentaPelicula {
+  pelicula_id: string;
+  entradas_vendidas: number;
+}

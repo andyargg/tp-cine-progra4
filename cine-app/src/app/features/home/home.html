@@ -8,18 +8,18 @@
   <section class="seccion">
     <h2>Más vendidas</h2>
     @if (masVendidas().length === 0) {
-      <p class="vacio">Todavía no hay películas cargadas.</p>
+      <p class="vacio">Todavía no se vendió ninguna entrada.</p>
     } @else {
       <div class="grilla">
         @for (pelicula of masVendidas(); track pelicula.id) {
-          <article class="tarjeta">
+          <a class="tarjeta" [routerLink]="['/peliculas', pelicula.id]">
             @if (pelicula.imagen_url) {
               <img [src]="pelicula.imagen_url" [alt]="pelicula.nombre" />
             } @else {
               <div class="poster-vacio" [attr.aria-label]="pelicula.nombre">🎬</div>
             }
             <h3>{{ pelicula.nombre }}</h3>
-          </article>
+          </a>
         }
       </div>
     }
