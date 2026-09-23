@@ -64,6 +64,7 @@ export class SeleccionButacas implements OnDestroy {
   protected readonly reservasAjenas = signal<Map<string, string>>(new Map());
   protected readonly seleccionadas = signal<Set<string>>(new Set());
   protected readonly usarCuponBienvenida = signal(false);
+  protected readonly codigoCupon = signal('');
   protected readonly confirmoVip = signal(false);
   protected readonly procesando = signal(false);
   protected readonly compraConfirmada = signal<CompraConfirmada | null>(null);
@@ -218,12 +219,15 @@ export class SeleccionButacas implements OnDestroy {
     const butacasElegidas = this.butacasSeleccionadas();
     const candyBar = this.itemsCandyPdf();
 
+    const codigo = this.codigoCupon().trim();
+
     try {
       const compraId = await this.comprasService.confirmarCompra(
         this.funcionId,
         butacasElegidas.map((b) => b.id),
-        this.usarCuponBienvenida() && this.puedeUsarCupon(),
+        this.usarCuponBienvenida() && this.puedeUsarCupon() && !codigo,
         this.itemsCandySeleccionados(),
+        codigo || null,
       );
 
       const compra = await this.comprasService.obtenerCompra(compraId);

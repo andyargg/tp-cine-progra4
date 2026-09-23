@@ -1,0 +1,132 @@
+<section class="admin">
+  <h1>Cupones y fidelización</h1>
+
+  @if (cargando()) {
+    <p>Cargando...</p>
+  } @else {
+    <section class="bloque">
+      <h2>Nuevo cupón</h2>
+
+      <form [formGroup]="formCupon" (ngSubmit)="crearCupon()" novalidate class="form-card">
+        <label>
+          Código
+          <input type="text" formControlName="codigo" placeholder="ej. VERANO20" />
+        </label>
+
+        <label>
+          Porcentaje de descuento
+          <input type="number" formControlName="porcentaje" min="1" max="100" />
+        </label>
+
+        <label>
+          Edad mínima (opcional)
+          <input type="number" formControlName="edad_minima" min="1" placeholder="ej. 50" />
+        </label>
+
+        <label>
+          Vigente desde
+          <input type="date" formControlName="vigencia_desde" />
+        </label>
+
+        <label>
+          Vigente hasta (opcional)
+          <input type="date" formControlName="vigencia_hasta" />
+        </label>
+
+        <button type="submit" [disabled]="guardandoCupon()">
+          @if (guardandoCupon()) {
+            Creando...
+          } @else {
+            Crear cupón
+          }
+        </button>
+      </form>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Código</th>
+            <th>%</th>
+            <th>Edad mín.</th>
+            <th>Vigencia</th>
+            <th>Estado</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (cupon of cupones(); track cupon.id) {
+            <tr>
+              <td>{{ cupon.codigo }}</td>
+              <td>{{ cupon.porcentaje }}%</td>
+              <td>{{ cupon.edad_minima ?? '-' }}</td>
+              <td>
+                {{ cupon.vigencia_desde | date: 'd/M/yy' }} -
+                {{ cupon.vigencia_hasta ? (cupon.vigencia_hasta | date: 'd/M/yy') : 'sin límite' }}
+              </td>
+              <td>{{ cupon.activo ? 'Activo' : 'Inactivo' }}</td>
+              <td>
+                <button type="button" (click)="alternarCupon(cupon)">
+                  {{ cupon.activo ? 'Desactivar' : 'Activar' }}
+                </button>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </section>
+
+    <section class="bloque">
+      <h2>Nueva recompensa</h2>
+
+      <form
+        [formGroup]="formRecompensa"
+        (ngSubmit)="crearRecompensa()"
+        novalidate
+        class="form-card"
+      >
+        <label>
+          Nombre
+          <input type="text" formControlName="nombre" placeholder="ej. Entrada gratis" />
+        </label>
+
+        <label>
+          Costo en puntos
+          <input type="number" formControlName="costo_puntos" min="1" />
+        </label>
+
+        <button type="submit" [disabled]="guardandoRecompensa()">
+          @if (guardandoRecompensa()) {
+            Creando...
+          } @else {
+            Crear recompensa
+          }
+        </button>
+      </form>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Nombre</th>
+            <th>Puntos</th>
+            <th>Estado</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (recompensa of recompensas(); track recompensa.id) {
+            <tr>
+              <td>{{ recompensa.nombre }}</td>
+              <td>{{ recompensa.costo_puntos }}</td>
+              <td>{{ recompensa.activa ? 'Activa' : 'Inactiva' }}</td>
+              <td>
+                <button type="button" (click)="alternarRecompensa(recompensa)">
+                  {{ recompensa.activa ? 'Desactivar' : 'Activar' }}
+                </button>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </section>
+  }
+</section>

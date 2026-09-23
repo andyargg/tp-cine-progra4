@@ -19,12 +19,14 @@ export class ComprasService {
     butacaIds: string[],
     usarCuponBienvenida: boolean,
     itemsCandy: ItemCandyBar[] = [],
+    codigoCupon: string | null = null,
   ): Promise<string> {
     const { data, error } = await this.supabaseService.client.rpc('confirmar_compra', {
       p_funcion_id: funcionId,
       p_butaca_ids: butacaIds,
       p_usar_cupon_bienvenida: usarCuponBienvenida,
       p_items_candy: itemsCandy,
+      p_codigo_cupon: codigoCupon,
     });
 
     if (error) throw error;

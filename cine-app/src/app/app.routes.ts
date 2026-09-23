@@ -68,6 +68,14 @@ export const routes: Routes = [
     canActivate: [rolGuard(['admin'])],
   },
   {
+    path: 'admin/fidelizacion',
+    loadComponent: () =>
+      import('./features/admin/fidelizacion-admin/fidelizacion-admin').then(
+        (m) => m.FidelizacionAdmin,
+      ),
+    canActivate: [rolGuard(['admin'])],
+  },
+  {
     path: '**',
     redirectTo: '',
   },

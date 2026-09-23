@@ -132,3 +132,28 @@ export interface CompraProducto {
   cantidad: number;
   precio_unitario: number;
 }
+
+export interface Cupon {
+  id: string;
+  codigo: string;
+  porcentaje: number;
+  edad_minima: number | null;
+  vigencia_desde: string;
+  vigencia_hasta: string | null;
+  activo: boolean;
+}
+
+export interface Recompensa {
+  id: string;
+  nombre: string;
+  costo_puntos: number;
+  activa: boolean;
+}
+
+export interface Canje {
+  id: string;
+  usuario_id: string;
+  recompensa_id: string;
+  puntos_usados: number;
+  created_at: string;
+}

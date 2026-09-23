@@ -114,10 +114,25 @@
           <input
             type="checkbox"
             [checked]="usarCuponBienvenida()"
+            [disabled]="codigoCupon().trim().length > 0"
             (change)="usarCuponBienvenida.set(!usarCuponBienvenida())"
           />
           Usar cupón de bienvenida (-{{ porcentajeCupon() }}%)
         </label>
+      }
+
+      <label>
+        ¿Tenés un cupón con código?
+        <input
+          type="text"
+          placeholder="Código de cupón"
+          [value]="codigoCupon()"
+          [disabled]="usarCuponBienvenida()"
+          (input)="codigoCupon.set($any($event.target).value)"
+        />
+      </label>
+      @if (codigoCupon().trim().length > 0) {
+        <p class="aviso-cupon">El descuento se calcula al confirmar la compra.</p>
       }
 
       @if (hayVipSeleccionada()) {

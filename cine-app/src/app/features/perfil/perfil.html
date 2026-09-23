@@ -88,5 +88,50 @@
         }
       </ul>
     }
+
+    <h2>Canjear puntos</h2>
+
+    @if (recompensas().length === 0) {
+      <p class="vacio">Todavía no hay recompensas disponibles.</p>
+    } @else {
+      <ul class="compras">
+        @for (recompensa of recompensas(); track recompensa.id) {
+          <li class="compra">
+            <div>
+              <strong>{{ recompensa.nombre }}</strong>
+              <span class="compra__fecha">{{ recompensa.costo_puntos }} pts</span>
+            </div>
+            <button
+              type="button"
+              [disabled]="
+                canjeando() === recompensa.id || u.puntos_acumulados < recompensa.costo_puntos
+              "
+              (click)="canjear(recompensa)"
+            >
+              {{ canjeando() === recompensa.id ? 'Canjeando...' : 'Canjear' }}
+            </button>
+          </li>
+        }
+      </ul>
+    }
+
+    <h2>Historial de canjes</h2>
+
+    @if (misCanjes().length === 0) {
+      <p class="vacio">Todavía no canjeaste puntos.</p>
+    } @else {
+      <ul class="compras">
+        @for (canje of misCanjes(); track canje.id) {
+          <li class="compra">
+            <div>
+              <strong>{{ nombreRecompensa(canje.recompensa_id) }}</strong>
+              <span class="compra__fecha"
+                >-{{ canje.puntos_usados }} pts · {{ canje.created_at | date: 'd/M/yy HH:mm' }}</span
+              >
+            </div>
+          </li>
+        }
+      </ul>
+    }
   }
 </section>

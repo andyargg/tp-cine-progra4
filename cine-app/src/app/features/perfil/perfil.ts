@@ -9,11 +9,12 @@ import { PeliculasService } from '../../core/services/peliculas.service';
 import { SalasService } from '../../core/services/salas.service';
 import { ButacasService } from '../../core/services/butacas.service';
 import { CandyBarService } from '../../core/services/candy-bar.service';
+import { RecompensasService } from '../../core/services/recompensas.service';
 import { ToastService } from '../../core/services/toast.service';
 import { calcularEdad } from '../../core/utils/edad.util';
 import { generarEntradaPdf } from '../../core/utils/entrada-pdf.util';
 import { mensajeDeError } from '../../core/utils/error.util';
-import { Compra } from '../../core/models/database.types';
+import { Canje, Compra, Recompensa } from '../../core/models/database.types';
 
 type EstadoGuardado = 'inicial' | 'guardando' | 'guardado' | 'error';
 
@@ -34,12 +35,16 @@ export class Perfil {
   private readonly salasService = inject(SalasService);
   private readonly butacasService = inject(ButacasService);
   private readonly candyBarService = inject(CandyBarService);
+  private readonly recompensasService = inject(RecompensasService);
   private readonly toastService = inject(ToastService);
 
   protected readonly usuario = this.authService.usuarioActual;
   protected readonly estado = signal<EstadoGuardado>('inicial');
   protected readonly misCompras = signal<Compra[]>([]);
   protected readonly cancelando = signal<string | null>(null);
+  protected readonly recompensas = signal<Recompensa[]>([]);
+  protected readonly misCanjes = signal<Canje[]>([]);
+  protected readonly canjeando = signal<string | null>(null);
 
   protected readonly edad = computed(() => {
     const fechaNacimiento = this.usuario()?.fecha_nacimiento;
@@ -54,10 +59,42 @@ export class Perfil {
 
   constructor() {
     this.cargarCompras();
+    this.cargarFidelizacion();
   }
 
   private async cargarCompras(): Promise<void> {
     this.misCompras.set(await this.comprasService.listarMisCompras());
+  }
+
+  private async cargarFidelizacion(): Promise<void> {
+    const [recompensas, canjes] = await Promise.all([
+      this.recompensasService.listarActivas(),
+      this.recompensasService.listarMisCanjes(),
+    ]);
+
+    this.recompensas.set(recompensas);
+    this.misCanjes.set(canjes);
+  }
+
+  protected nombreRecompensa(recompensaId: string): string {
+    return this.recompensas().find((r) => r.id === recompensaId)?.nombre ?? 'Recompensa';
+  }
+
+  async canjear(recompensa: Recompensa): Promise<void> {
+    const usuarioActual = this.usuario();
+    if (!usuarioActual || usuarioActual.puntos_acumulados < recompensa.costo_puntos) return;
+
+    this.canjeando.set(recompensa.id);
+
+    try {
+      await this.recompensasService.canjear(recompensa.id);
+      this.toastService.exito(`Canjeaste "${recompensa.nombre}".`);
+      await Promise.all([this.cargarFidelizacion(), this.authService.refrescarUsuarioActual()]);
+    } catch (err) {
+      this.toastService.error(mensajeDeError(err, 'No se pudo canjear la recompensa.'));
+    } finally {
+      this.canjeando.set(null);
+    }
   }
 
   async guardar(): Promise<void> {
