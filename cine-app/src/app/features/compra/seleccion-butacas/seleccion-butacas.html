@@ -11,6 +11,14 @@
           <span class="chip">{{ b.fila }}{{ b.columna }}</span>
         }
       </p>
+      @if (compra.candyBar.length > 0) {
+        <p>
+          Candy bar:
+          @for (item of compra.candyBar; track item.nombre) {
+            <span class="chip">{{ item.cantidad }}x {{ item.nombre }}</span>
+          }
+        </p>
+      }
       <button type="button" (click)="descargarPdf()">Descargar entrada (PDF)</button>
       <a routerLink="/peliculas">Volver a la cartelera</a>
     </div>
@@ -52,9 +60,54 @@
       }
     </div>
 
+    @if (combosCandy().length > 0 || productosCandy().length > 0) {
+      <div class="candy-bar">
+        <h2>Candy bar</h2>
+
+        @if (combosCandy().length > 0) {
+          <div class="candy-bar__grupo">
+            <h3>Combos</h3>
+            @for (combo of combosCandy(); track combo.id) {
+              <div class="candy-bar__item">
+                <span>{{ combo.nombre }} — ${{ combo.precio }}</span>
+                <div class="cantidad">
+                  <button type="button" (click)="cambiarCantidadCombo(combo.id, -1)">-</button>
+                  <span>{{ cantidadesCombos().get(combo.id) ?? 0 }}</span>
+                  <button type="button" (click)="cambiarCantidadCombo(combo.id, 1)">+</button>
+                </div>
+              </div>
+            }
+          </div>
+        }
+
+        @if (productosCandy().length > 0) {
+          <div class="candy-bar__grupo">
+            <h3>Productos individuales</h3>
+            @for (producto of productosCandy(); track producto.id) {
+              <div class="candy-bar__item">
+                <span>{{ producto.nombre }} — ${{ producto.precio }}</span>
+                <div class="cantidad">
+                  <button type="button" (click)="cambiarCantidadProducto(producto.id, -1)">
+                    -
+                  </button>
+                  <span>{{ cantidadesProductos().get(producto.id) ?? 0 }}</span>
+                  <button type="button" (click)="cambiarCantidadProducto(producto.id, 1)">
+                    +
+                  </button>
+                </div>
+              </div>
+            }
+          </div>
+        }
+      </div>
+    }
+
     <div class="resumen">
       <p>Butacas seleccionadas: {{ seleccionadas().size }}</p>
-      <p>Subtotal: ${{ subtotal() }}</p>
+      <p>Subtotal butacas: ${{ subtotal() }}</p>
+      @if (subtotalCandy() > 0) {
+        <p>Subtotal candy bar: ${{ subtotalCandy() }}</p>
+      }
 
       @if (puedeUsarCupon()) {
         <label class="checkbox">

@@ -98,3 +98,37 @@ export interface ButacaReservadaTemp {
   session_id: string;
   expires_at: string;
 }
+
+export interface CategoriaProducto {
+  id: number;
+  nombre: string;
+}
+
+export interface Producto {
+  id: string;
+  categoria_id: number;
+  nombre: string;
+  precio: number;
+  imagen_url: string | null;
+  activo: boolean;
+}
+
+export interface Combo {
+  id: string;
+  nombre: string;
+  precio: number;
+  activo: boolean;
+}
+
+export interface ComboConProductos extends Combo {
+  productos: { producto: Producto; cantidad: number }[];
+}
+
+export interface CompraProducto {
+  id: string;
+  compra_id: string;
+  producto_id: string | null;
+  combo_id: string | null;
+  cantidad: number;
+  precio_unitario: number;
+}

@@ -1,0 +1,130 @@
+<section class="admin">
+  <h1>Candy bar</h1>
+
+  @if (cargando()) {
+    <p>Cargando...</p>
+  } @else {
+    <section class="bloque">
+      <h2>Categorías</h2>
+
+      <form [formGroup]="formCategoria" (ngSubmit)="crearCategoria()" novalidate class="alta">
+        <input type="text" formControlName="nombre" placeholder="Nombre de categoría" />
+        <button type="submit" [disabled]="guardandoCategoria()">Agregar</button>
+      </form>
+
+      <ul class="lista-simple">
+        @for (categoria of categorias(); track categoria.id) {
+          <li>{{ categoria.nombre }}</li>
+        }
+      </ul>
+    </section>
+
+    <section class="bloque">
+      <h2>{{ editandoProductoId() ? 'Editar producto' : 'Nuevo producto' }}</h2>
+
+      <form [formGroup]="formProducto" (ngSubmit)="guardarProducto()" novalidate class="form-card">
+        <label>
+          Categoría
+          <select formControlName="categoria_id">
+            <option [value]="null" disabled>Elegí una categoría</option>
+            @for (categoria of categorias(); track categoria.id) {
+              <option [value]="categoria.id">{{ categoria.nombre }}</option>
+            }
+          </select>
+        </label>
+
+        <label>
+          Nombre
+          <input type="text" formControlName="nombre" />
+        </label>
+
+        <label>
+          Precio
+          <input type="number" formControlName="precio" min="1" />
+        </label>
+
+        <label>
+          URL de imagen
+          <input type="text" formControlName="imagen_url" placeholder="https://..." />
+        </label>
+
+        <div class="acciones">
+          <button type="submit" [disabled]="guardandoProducto()">
+            @if (guardandoProducto()) {
+              Guardando...
+            } @else {
+              Guardar
+            }
+          </button>
+          @if (editandoProductoId()) {
+            <button type="button" (click)="cancelarEdicionProducto()">Cancelar</button>
+          }
+        </div>
+      </form>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Nombre</th>
+            <th>Precio</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (producto of productos(); track producto.id) {
+            <tr>
+              <td>{{ producto.nombre }}</td>
+              <td>${{ producto.precio }}</td>
+              <td><a (click)="editarProducto(producto)">Editar</a></td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </section>
+
+    <section class="bloque">
+      <h2>Nuevo combo</h2>
+
+      <form [formGroup]="formCombo" (ngSubmit)="crearCombo()" novalidate class="form-card">
+        <label>
+          Nombre
+          <input type="text" formControlName="nombre" />
+        </label>
+
+        <label>
+          Precio fijo
+          <input type="number" formControlName="precio" min="1" />
+        </label>
+
+        <fieldset formArrayName="productos">
+          <legend>Productos incluidos</legend>
+          @for (producto of productos(); track producto.id; let i = $index) {
+            <label class="checkbox">
+              <input type="checkbox" [formControlName]="i" />
+              {{ producto.nombre }}
+            </label>
+          }
+        </fieldset>
+
+        <button type="submit" [disabled]="guardandoCombo()">
+          @if (guardandoCombo()) {
+            Creando...
+          } @else {
+            Crear combo
+          }
+        </button>
+      </form>
+
+      <ul class="lista-combos">
+        @for (combo of combos(); track combo.id) {
+          <li>
+            <strong>{{ combo.nombre }}</strong> — ${{ combo.precio }}
+            <span class="detalle-combo">
+              ({{ combo.productos.map((p) => p.producto.nombre).join(', ') }})
+            </span>
+          </li>
+        }
+      </ul>
+    </section>
+  }
+</section>

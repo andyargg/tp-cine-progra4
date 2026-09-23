@@ -113,6 +113,47 @@ i.vendida {
   cursor: not-allowed;
 }
 
+.candy-bar {
+  background: var(--color-surface);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
+  margin-bottom: var(--space-4);
+}
+
+.candy-bar__grupo {
+  margin-bottom: var(--space-3);
+}
+
+.candy-bar__grupo h3 {
+  font-size: 0.9rem;
+  color: var(--color-text-muted);
+  margin-bottom: var(--space-2);
+}
+
+.candy-bar__item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--space-1) 0;
+}
+
+.cantidad {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.cantidad button {
+  width: 1.8rem;
+  height: 1.8rem;
+  padding: 0;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--color-border);
+  background: var(--color-bg);
+  color: var(--color-text);
+  cursor: pointer;
+}
+
 .resumen {
   background: var(--color-surface);
   border-radius: var(--radius-lg);

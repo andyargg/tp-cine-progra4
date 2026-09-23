@@ -1,7 +1,13 @@
 import { Injectable, inject } from '@angular/core';
 import { SupabaseService } from './supabase.service';
 import { AuthService } from './auth.service';
-import { Compra, Entrada } from '../models/database.types';
+import { Compra, CompraProducto, Entrada } from '../models/database.types';
+
+export interface ItemCandyBar {
+  producto_id: string | null;
+  combo_id: string | null;
+  cantidad: number;
+}
 
 @Injectable({ providedIn: 'root' })
 export class ComprasService {
@@ -12,11 +18,13 @@ export class ComprasService {
     funcionId: string,
     butacaIds: string[],
     usarCuponBienvenida: boolean,
+    itemsCandy: ItemCandyBar[] = [],
   ): Promise<string> {
     const { data, error } = await this.supabaseService.client.rpc('confirmar_compra', {
       p_funcion_id: funcionId,
       p_butaca_ids: butacaIds,
       p_usar_cupon_bienvenida: usarCuponBienvenida,
+      p_items_candy: itemsCandy,
     });
 
     if (error) throw error;
@@ -45,6 +53,16 @@ export class ComprasService {
   async listarEntradasDeCompra(compraId: string): Promise<Entrada[]> {
     const { data, error } = await this.supabaseService.client
       .from('entradas')
+      .select('*')
+      .eq('compra_id', compraId);
+
+    if (error) throw error;
+    return data ?? [];
+  }
+
+  async listarProductosDeCompra(compraId: string): Promise<CompraProducto[]> {
+    const { data, error } = await this.supabaseService.client
+      .from('compra_productos')
       .select('*')
       .eq('compra_id', compraId);
 

@@ -6,19 +6,28 @@ import { ButacasService } from '../../../core/services/butacas.service';
 import { FuncionesService } from '../../../core/services/funciones.service';
 import { PeliculasService } from '../../../core/services/peliculas.service';
 import { SalasService } from '../../../core/services/salas.service';
-import { ComprasService } from '../../../core/services/compras.service';
+import { ComprasService, ItemCandyBar } from '../../../core/services/compras.service';
 import { AuthService } from '../../../core/services/auth.service';
 import { SupabaseService } from '../../../core/services/supabase.service';
+import { CandyBarService } from '../../../core/services/candy-bar.service';
 import { ToastService } from '../../../core/services/toast.service';
 import { calcularPrecioVigente } from '../../../core/utils/funciones.util';
-import { generarEntradaPdf } from '../../../core/utils/entrada-pdf.util';
+import { generarEntradaPdf, ItemCandyBarPdf } from '../../../core/utils/entrada-pdf.util';
 import { mensajeDeError } from '../../../core/utils/error.util';
-import { Butaca, Funcion, PeliculaConGeneros, Sala } from '../../../core/models/database.types';
+import {
+  Butaca,
+  ComboConProductos,
+  Funcion,
+  PeliculaConGeneros,
+  Producto,
+  Sala,
+} from '../../../core/models/database.types';
 
 interface CompraConfirmada {
   compraId: string;
   total: number;
   butacas: { fila: string; columna: number }[];
+  candyBar: ItemCandyBarPdf[];
 }
 
 @Component({
@@ -38,6 +47,7 @@ export class SeleccionButacas implements OnDestroy {
   private readonly comprasService = inject(ComprasService);
   private readonly toastService = inject(ToastService);
   private readonly supabaseService = inject(SupabaseService);
+  private readonly candyBarService = inject(CandyBarService);
   protected readonly authService = inject(AuthService);
 
   private readonly funcionId = this.route.snapshot.paramMap.get('funcionId')!;
@@ -59,6 +69,10 @@ export class SeleccionButacas implements OnDestroy {
   protected readonly compraConfirmada = signal<CompraConfirmada | null>(null);
   protected readonly precioUnitario = signal(0);
   protected readonly porcentajeCupon = signal(0);
+  protected readonly productosCandy = signal<Producto[]>([]);
+  protected readonly combosCandy = signal<ComboConProductos[]>([]);
+  protected readonly cantidadesProductos = signal<Map<string, number>>(new Map());
+  protected readonly cantidadesCombos = signal<Map<string, number>>(new Map());
 
   protected readonly filas = computed(() => {
     const porFila = new Map<string, Butaca[]>();
@@ -85,12 +99,43 @@ export class SeleccionButacas implements OnDestroy {
 
   protected readonly subtotal = computed(() => this.precioUnitario() * this.seleccionadas().size);
 
+  protected readonly subtotalCandy = computed(() => {
+    const cantidadesP = this.cantidadesProductos();
+    const cantidadesC = this.cantidadesCombos();
+
+    const totalProductos = this.productosCandy().reduce(
+      (acc, p) => acc + (cantidadesP.get(p.id) ?? 0) * p.precio,
+      0,
+    );
+    const totalCombos = this.combosCandy().reduce(
+      (acc, c) => acc + (cantidadesC.get(c.id) ?? 0) * c.precio,
+      0,
+    );
+
+    return totalProductos + totalCombos;
+  });
+
+  protected readonly itemsCandySeleccionados = computed<ItemCandyBar[]>(() => {
+    const items: ItemCandyBar[] = [];
+
+    for (const [productoId, cantidad] of this.cantidadesProductos()) {
+      if (cantidad > 0) items.push({ producto_id: productoId, combo_id: null, cantidad });
+    }
+    for (const [comboId, cantidad] of this.cantidadesCombos()) {
+      if (cantidad > 0) items.push({ producto_id: null, combo_id: comboId, cantidad });
+    }
+
+    return items;
+  });
+
   protected readonly totalEstimado = computed(() => {
     const sub = this.subtotal();
-    if (this.usarCuponBienvenida() && this.puedeUsarCupon()) {
-      return Math.round((sub - (sub * this.porcentajeCupon()) / 100) * 100) / 100;
-    }
-    return sub;
+    const conDescuento =
+      this.usarCuponBienvenida() && this.puedeUsarCupon()
+        ? Math.round((sub - (sub * this.porcentajeCupon()) / 100) * 100) / 100
+        : sub;
+
+    return conDescuento + this.subtotalCandy();
   });
 
   protected readonly puedeConfirmar = computed(
@@ -137,17 +182,48 @@ export class SeleccionButacas implements OnDestroy {
     }
   }
 
+  protected cambiarCantidadProducto(productoId: string, delta: number): void {
+    const actuales = new Map(this.cantidadesProductos());
+    const nueva = Math.max(0, (actuales.get(productoId) ?? 0) + delta);
+    actuales.set(productoId, nueva);
+    this.cantidadesProductos.set(actuales);
+  }
+
+  protected cambiarCantidadCombo(comboId: string, delta: number): void {
+    const actuales = new Map(this.cantidadesCombos());
+    const nueva = Math.max(0, (actuales.get(comboId) ?? 0) + delta);
+    actuales.set(comboId, nueva);
+    this.cantidadesCombos.set(actuales);
+  }
+
+  private itemsCandyPdf(): ItemCandyBarPdf[] {
+    const items: ItemCandyBarPdf[] = [];
+
+    for (const producto of this.productosCandy()) {
+      const cantidad = this.cantidadesProductos().get(producto.id) ?? 0;
+      if (cantidad > 0) items.push({ nombre: producto.nombre, cantidad });
+    }
+    for (const combo of this.combosCandy()) {
+      const cantidad = this.cantidadesCombos().get(combo.id) ?? 0;
+      if (cantidad > 0) items.push({ nombre: combo.nombre, cantidad });
+    }
+
+    return items;
+  }
+
   async confirmar(): Promise<void> {
     if (!this.puedeConfirmar()) return;
 
     this.procesando.set(true);
     const butacasElegidas = this.butacasSeleccionadas();
+    const candyBar = this.itemsCandyPdf();
 
     try {
       const compraId = await this.comprasService.confirmarCompra(
         this.funcionId,
         butacasElegidas.map((b) => b.id),
         this.usarCuponBienvenida() && this.puedeUsarCupon(),
+        this.itemsCandySeleccionados(),
       );
 
       const compra = await this.comprasService.obtenerCompra(compraId);
@@ -156,6 +232,7 @@ export class SeleccionButacas implements OnDestroy {
         compraId,
         total: compra.total,
         butacas: butacasElegidas.map((b) => ({ fila: b.fila, columna: b.columna })),
+        candyBar,
       });
 
       await this.descargarPdf();
@@ -182,6 +259,7 @@ export class SeleccionButacas implements OnDestroy {
       funcionInicio: funcion.inicio,
       salaNombre: sala.nombre,
       butacas: compra.butacas,
+      candyBar: compra.candyBar,
       total: compra.total,
     });
   }
@@ -226,6 +304,13 @@ export class SeleccionButacas implements OnDestroy {
     if (sala) {
       this.butacas.set(await this.butacasService.listarPorSala(sala.id));
     }
+
+    const [productosCandy, combosCandy] = await Promise.all([
+      this.candyBarService.listarProductosActivos(),
+      this.candyBarService.listarCombosActivos(),
+    ]);
+    this.productosCandy.set(productosCandy);
+    this.combosCandy.set(combosCandy);
 
     await this.cargarBufferConfig();
     await this.actualizarEstadoOcupacion();

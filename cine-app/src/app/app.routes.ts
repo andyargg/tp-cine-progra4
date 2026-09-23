@@ -62,6 +62,12 @@ export const routes: Routes = [
     canActivate: [rolGuard(['admin'])],
   },
   {
+    path: 'admin/candy-bar',
+    loadComponent: () =>
+      import('./features/admin/candy-bar-admin/candy-bar-admin').then((m) => m.CandyBarAdmin),
+    canActivate: [rolGuard(['admin'])],
+  },
+  {
     path: '**',
     redirectTo: '',
   },

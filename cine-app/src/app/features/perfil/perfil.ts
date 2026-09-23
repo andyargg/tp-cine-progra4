@@ -8,6 +8,7 @@ import { FuncionesService } from '../../core/services/funciones.service';
 import { PeliculasService } from '../../core/services/peliculas.service';
 import { SalasService } from '../../core/services/salas.service';
 import { ButacasService } from '../../core/services/butacas.service';
+import { CandyBarService } from '../../core/services/candy-bar.service';
 import { ToastService } from '../../core/services/toast.service';
 import { calcularEdad } from '../../core/utils/edad.util';
 import { generarEntradaPdf } from '../../core/utils/entrada-pdf.util';
@@ -32,6 +33,7 @@ export class Perfil {
   private readonly peliculasService = inject(PeliculasService);
   private readonly salasService = inject(SalasService);
   private readonly butacasService = inject(ButacasService);
+  private readonly candyBarService = inject(CandyBarService);
   private readonly toastService = inject(ToastService);
 
   protected readonly usuario = this.authService.usuarioActual;
@@ -108,13 +110,16 @@ export class Perfil {
       const funcion = await this.funcionesService.obtenerPorId(entradas[0].funcion_id);
       if (!funcion) return;
 
-      const [pelicula, sala, butacas] = await Promise.all([
+      const [pelicula, sala, butacas, productosCompra] = await Promise.all([
         this.peliculasService.obtenerPorId(funcion.pelicula_id),
         this.salasService.obtenerPorId(funcion.sala_id),
         this.butacasService.obtenerPorIds(entradas.map((e) => e.butaca_id)),
+        this.comprasService.listarProductosDeCompra(compra.id),
       ]);
 
       if (!pelicula || !sala) return;
+
+      const candyBar = await this.candyBarService.nombrarItemsDeCompra(productosCompra);
 
       await generarEntradaPdf({
         compraId: compra.id,
@@ -123,6 +128,7 @@ export class Perfil {
         funcionInicio: funcion.inicio,
         salaNombre: sala.nombre,
         butacas: butacas.map((b) => ({ fila: b.fila, columna: b.columna })),
+        candyBar,
         total: compra.total,
       });
     } catch (err) {
