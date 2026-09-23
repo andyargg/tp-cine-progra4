@@ -28,7 +28,7 @@ _Pendiente — se va a completar a medida que avancen los sprints (ver [02-sprin
 - [x] Sprint 1 — Usuarios y autenticación
 - [x] Sprint 2 — Catálogo de películas y salas
 - [x] Sprint 3 — Funciones y asignación automática de salas
-- [ ] Sprint 4 — Selección de butacas y compra de entradas
+- [x] Sprint 4 — Selección de butacas y compra de entradas
 - [ ] Sprint 5 — Candy bar y combos
 - [ ] Sprint 6 — Cupones y programa de fidelización
 - [ ] Sprint 7 — Reseñas y "Mis películas"
