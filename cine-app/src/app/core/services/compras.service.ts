@@ -41,6 +41,24 @@ export class ComprasService {
     if (error) throw error;
   }
 
+  async validarEntradas(compraId: string): Promise<number> {
+    const { data, error } = await this.supabaseService.client.rpc('validar_entradas', {
+      p_compra_id: compraId,
+    });
+
+    if (error) throw error;
+    return data as number;
+  }
+
+  async validarCandy(compraId: string): Promise<number> {
+    const { data, error } = await this.supabaseService.client.rpc('validar_candy', {
+      p_compra_id: compraId,
+    });
+
+    if (error) throw error;
+    return data as number;
+  }
+
   async obtenerCompra(compraId: string): Promise<Compra> {
     const { data, error } = await this.supabaseService.client
       .from('compras')

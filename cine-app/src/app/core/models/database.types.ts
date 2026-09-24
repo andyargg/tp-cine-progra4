@@ -131,6 +131,7 @@ export interface CompraProducto {
   combo_id: string | null;
   cantidad: number;
   precio_unitario: number;
+  retirado: boolean;
 }
 
 export interface Cupon {

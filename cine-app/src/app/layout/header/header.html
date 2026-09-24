@@ -8,6 +8,9 @@
       @if (usuario.rol === 'admin') {
         <a routerLink="/admin">Panel admin</a>
       }
+      @if (usuario.rol === 'admin' || usuario.rol === 'empleado') {
+        <a routerLink="/empleado/validar">Validar QR</a>
+      }
       <a routerLink="/mis-peliculas">Mis películas</a>
       <a routerLink="/perfil">{{ usuario.nombre }}</a>
       <button type="button" (click)="cerrarSesion()">Cerrar sesión</button>

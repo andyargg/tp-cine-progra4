@@ -101,6 +101,12 @@ export const routes: Routes = [
     canActivate: [rolGuard(['admin'])],
   },
   {
+    path: 'empleado/validar',
+    loadComponent: () =>
+      import('./features/empleado/validar-qr/validar-qr').then((m) => m.ValidarQr),
+    canActivate: [rolGuard(['empleado', 'admin'])],
+  },
+  {
     path: '**',
     redirectTo: '',
   },

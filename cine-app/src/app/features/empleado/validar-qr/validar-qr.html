@@ -1,0 +1,78 @@
+<section class="validar">
+  <h1>Validar entradas / candy bar</h1>
+
+  @if (!resumen()) {
+    <div class="camara" [class.oculta]="!camaraDisponible()">
+      <video #video></video>
+    </div>
+
+    @if (!camaraDisponible()) {
+      <p class="aviso">No se pudo acceder a la cámara. Ingresá el código manualmente.</p>
+    }
+
+    <form class="manual" (ngSubmit)="buscarManual()">
+      <input
+        type="text"
+        placeholder="Código de la compra"
+        [ngModel]="codigoManual()"
+        (ngModelChange)="codigoManual.set($event)"
+        name="codigoManual"
+      />
+      <button type="submit" [disabled]="buscando()">
+        @if (buscando()) {
+          Buscando...
+        } @else {
+          Buscar
+        }
+      </button>
+    </form>
+  } @else {
+    <div class="resumen">
+      <div class="resumen__header">
+        <h2>Compra {{ resumen()!.compra.id }}</h2>
+        <button type="button" (click)="limpiar()">Escanear otro</button>
+      </div>
+
+      @if (resumen()!.entradas.length > 0) {
+        <h3>Entradas</h3>
+        <ul>
+          @for (entrada of resumen()!.entradas; track entrada.id) {
+            <li>
+              {{ entrada.peliculaNombre }} · {{ entrada.funcionInicio | date: 'd/M HH:mm' }} ·
+              {{ entrada.fila }}{{ entrada.columna }}
+              <span class="estado estado--{{ entrada.estado }}">{{ entrada.estado }}</span>
+            </li>
+          }
+        </ul>
+        <button
+          type="button"
+          [disabled]="validando()"
+          (click)="validarEntradas()"
+        >
+          Validar entradas pendientes
+        </button>
+      }
+
+      @if (resumen()!.productos.length > 0) {
+        <h3>Candy bar</h3>
+        <ul>
+          @for (producto of resumen()!.productos; track producto.nombre) {
+            <li>
+              {{ producto.cantidad }}x {{ producto.nombre }}
+              <span class="estado" [class.estado--validada]="producto.retirado">
+                {{ producto.retirado ? 'entregado' : 'pendiente' }}
+              </span>
+            </li>
+          }
+        </ul>
+        <button type="button" [disabled]="validando()" (click)="validarCandy()">
+          Marcar candy bar entregado
+        </button>
+      }
+
+      @if (resumen()!.entradas.length === 0 && resumen()!.productos.length === 0) {
+        <p class="aviso">Esta compra no tiene entradas ni candy bar asociado.</p>
+      }
+    </div>
+  }
+</section>

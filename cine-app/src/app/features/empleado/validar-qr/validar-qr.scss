@@ -1,0 +1,121 @@
+.validar {
+  max-width: 480px;
+  margin: 0 auto;
+  padding: var(--space-5) var(--space-4);
+}
+
+.camara {
+  width: 100%;
+  aspect-ratio: 1;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  background: var(--color-surface);
+  margin-bottom: var(--space-3);
+}
+
+.camara.oculta {
+  display: none;
+}
+
+.camara video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.aviso {
+  color: var(--color-text-muted);
+  margin-bottom: var(--space-3);
+}
+
+.manual {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.manual input {
+  flex: 1;
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  color: var(--color-text);
+  font: inherit;
+}
+
+button {
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-sm);
+  border: none;
+  background: var(--color-primary);
+  color: var(--color-primary-contrast);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.resumen {
+  background: var(--color-surface);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
+}
+
+.resumen__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--space-2);
+  margin-bottom: var(--space-3);
+}
+
+.resumen__header h2 {
+  font-size: 0.85rem;
+  word-break: break-all;
+  color: var(--color-text-muted);
+}
+
+.resumen h3 {
+  margin-top: var(--space-3);
+  font-size: 0.95rem;
+}
+
+.resumen ul {
+  list-style: none;
+  margin: 0 0 var(--space-2);
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.resumen li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2);
+  background: var(--color-bg);
+  border-radius: var(--radius-sm);
+  font-size: 0.85rem;
+}
+
+.estado {
+  padding: 0.1rem var(--space-2);
+  border-radius: var(--radius-sm);
+  font-size: 0.75rem;
+  background: color-mix(in srgb, var(--color-danger) 20%, transparent);
+  color: var(--color-danger);
+}
+
+.estado--validada {
+  background: color-mix(in srgb, var(--color-success) 20%, transparent);
+  color: var(--color-success);
+}
+
+.resumen > button {
+  margin-bottom: var(--space-2);
+}
