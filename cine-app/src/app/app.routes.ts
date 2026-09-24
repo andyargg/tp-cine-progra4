@@ -45,6 +45,12 @@ export const routes: Routes = [
     canActivate: [authGuard],
   },
   {
+    path: 'admin',
+    loadComponent: () =>
+      import('./features/admin/dashboard-admin/dashboard-admin').then((m) => m.DashboardAdmin),
+    canActivate: [rolGuard(['admin'])],
+  },
+  {
     path: 'admin/peliculas',
     loadComponent: () =>
       import('./features/admin/peliculas-admin/peliculas-admin').then((m) => m.PeliculasAdmin),
@@ -86,6 +92,12 @@ export const routes: Routes = [
       import('./features/admin/fidelizacion-admin/fidelizacion-admin').then(
         (m) => m.FidelizacionAdmin,
       ),
+    canActivate: [rolGuard(['admin'])],
+  },
+  {
+    path: 'admin/reportes',
+    loadComponent: () =>
+      import('./features/admin/reportes-admin/reportes-admin').then((m) => m.ReportesAdmin),
     canActivate: [rolGuard(['admin'])],
   },
   {

@@ -1,0 +1,12 @@
+<section class="dashboard">
+  <h1>Panel de administración</h1>
+
+  <div class="grilla">
+    @for (acceso of accesos; track acceso.ruta) {
+      <a class="tarjeta" [routerLink]="acceso.ruta">
+        <h2>{{ acceso.titulo }}</h2>
+        <p>{{ acceso.descripcion }}</p>
+      </a>
+    }
+  </div>
+</section>

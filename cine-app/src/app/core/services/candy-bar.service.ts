@@ -1,12 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { SupabaseService } from './supabase.service';
-import {
-  CategoriaProducto,
-  Combo,
-  ComboConProductos,
-  CompraProducto,
-  Producto,
-} from '../models/database.types';
+import { LogsService } from './logs.service';
+import { CategoriaProducto, ComboConProductos, Producto } from '../models/database.types';
 
 interface ProductoFormValue {
   categoria_id: number;
@@ -18,6 +13,7 @@ interface ProductoFormValue {
 @Injectable({ providedIn: 'root' })
 export class CandyBarService {
   private readonly supabaseService = inject(SupabaseService);
+  private readonly logsService = inject(LogsService);
 
   async listarCategorias(): Promise<CategoriaProducto[]> {
     const { data, error } = await this.supabaseService.client
@@ -51,6 +47,8 @@ export class CandyBarService {
   async crearProducto(valores: ProductoFormValue): Promise<void> {
     const { error } = await this.supabaseService.client.from('productos').insert(valores);
     if (error) throw error;
+
+    await this.logsService.registrar('producto_creado', { nombre: valores.nombre });
   }
 
   async actualizarProducto(id: string, valores: ProductoFormValue): Promise<void> {
@@ -82,6 +80,7 @@ export class CandyBarService {
 
     if (error) throw error;
     await this.reemplazarProductosDeCombo(data.id, productoIds);
+    await this.logsService.registrar('combo_creado', { nombre });
   }
 
   private async reemplazarProductosDeCombo(comboId: string, productoIds: string[]): Promise<void> {
@@ -100,7 +99,7 @@ export class CandyBarService {
   }
 
   async nombrarItemsDeCompra(
-    items: CompraProducto[],
+    items: { producto_id: string | null; combo_id: string | null; cantidad: number }[],
   ): Promise<{ nombre: string; cantidad: number }[]> {
     const productoIds = items.filter((i) => i.producto_id).map((i) => i.producto_id!);
     const comboIds = items.filter((i) => i.combo_id).map((i) => i.combo_id!);

@@ -177,3 +177,28 @@ export interface VentaPelicula {
   pelicula_id: string;
   entradas_vendidas: number;
 }
+
+export interface LogActividad {
+  id: string;
+  usuario_id: string | null;
+  accion: string;
+  detalle: unknown;
+  created_at: string;
+}
+
+export interface FacturacionDiaria {
+  dia: string;
+  total_facturado: number;
+  entradas_vendidas: number;
+}
+
+export interface PeliculaMasVista {
+  pelicula_id: string;
+  entradas: number;
+}
+
+export interface CandyMasVendido {
+  producto_id: string | null;
+  combo_id: string | null;
+  cantidad: number;
+}

@@ -1,11 +1,13 @@
 import { Injectable, inject } from '@angular/core';
 import { SupabaseService } from './supabase.service';
+import { LogsService } from './logs.service';
 import { Sala } from '../models/database.types';
 import { generarButacas } from '../utils/butacas.util';
 
 @Injectable({ providedIn: 'root' })
 export class SalasService {
   private readonly supabaseService = inject(SupabaseService);
+  private readonly logsService = inject(LogsService);
 
   async listar(): Promise<Sala[]> {
     const { data, error } = await this.supabaseService.client
@@ -44,6 +46,7 @@ export class SalasService {
 
     if (errorButacas) throw errorButacas;
 
+    await this.logsService.registrar('sala_creada', { salaId: data.id, nombre });
     return data.id;
   }
 

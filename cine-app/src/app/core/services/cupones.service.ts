@@ -1,5 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { SupabaseService } from './supabase.service';
+import { LogsService } from './logs.service';
 import { Cupon } from '../models/database.types';
 
 interface CuponFormValue {
@@ -13,6 +14,7 @@ interface CuponFormValue {
 @Injectable({ providedIn: 'root' })
 export class CuponesService {
   private readonly supabaseService = inject(SupabaseService);
+  private readonly logsService = inject(LogsService);
 
   async listar(): Promise<Cupon[]> {
     const { data, error } = await this.supabaseService.client
@@ -27,6 +29,8 @@ export class CuponesService {
   async crear(valores: CuponFormValue): Promise<void> {
     const { error } = await this.supabaseService.client.from('cupones').insert(valores);
     if (error) throw error;
+
+    await this.logsService.registrar('cupon_creado', { codigo: valores.codigo });
   }
 
   async cambiarActivo(id: string, activo: boolean): Promise<void> {
@@ -36,5 +40,7 @@ export class CuponesService {
       .eq('id', id);
 
     if (error) throw error;
+
+    await this.logsService.registrar('cupon_actualizado', { cuponId: id, activo });
   }
 }

@@ -1,5 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { SupabaseService } from './supabase.service';
+import { LogsService } from './logs.service';
 import { Genero, Pelicula, PeliculaConGeneros } from '../models/database.types';
 
 interface PeliculaFormValue {
@@ -16,6 +17,7 @@ interface PeliculaFormValue {
 @Injectable({ providedIn: 'root' })
 export class PeliculasService {
   private readonly supabaseService = inject(SupabaseService);
+  private readonly logsService = inject(LogsService);
 
   async listarGeneros(): Promise<Genero[]> {
     const { data, error } = await this.supabaseService.client
@@ -99,6 +101,7 @@ export class PeliculasService {
     if (error) throw error;
 
     await this.reemplazarGeneros(data.id, generoIds);
+    await this.logsService.registrar('pelicula_creada', { peliculaId: data.id, nombre: valores.nombre });
     return data.id;
   }
 
@@ -111,6 +114,7 @@ export class PeliculasService {
     if (error) throw error;
 
     await this.reemplazarGeneros(id, generoIds);
+    await this.logsService.registrar('pelicula_editada', { peliculaId: id, nombre: valores.nombre });
   }
 
   private async reemplazarGeneros(peliculaId: string, generoIds: number[]): Promise<void> {

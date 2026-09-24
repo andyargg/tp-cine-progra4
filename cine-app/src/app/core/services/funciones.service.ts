@@ -1,5 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { SupabaseService } from './supabase.service';
+import { LogsService } from './logs.service';
 import { Funcion } from '../models/database.types';
 import { generarFechas, hayConflicto } from '../utils/funciones.util';
 
@@ -20,6 +21,7 @@ interface ResultadoLote {
 @Injectable({ providedIn: 'root' })
 export class FuncionesService {
   private readonly supabaseService = inject(SupabaseService);
+  private readonly logsService = inject(LogsService);
 
   async listarFuturasPorPeliculas(peliculaIds: string[]): Promise<Funcion[]> {
     if (peliculaIds.length === 0) return [];
@@ -144,6 +146,11 @@ export class FuncionesService {
     if (nuevasFunciones.length > 0) {
       const { error } = await this.supabaseService.client.from('funciones').insert(nuevasFunciones);
       if (error) throw error;
+
+      await this.logsService.registrar('funciones_creadas', {
+        peliculaId: input.peliculaId,
+        cantidad: nuevasFunciones.length,
+      });
     }
 
     return { creadas: nuevasFunciones.length, fallidas };
