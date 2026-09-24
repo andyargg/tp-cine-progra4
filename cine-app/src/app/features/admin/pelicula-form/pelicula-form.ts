@@ -10,11 +10,12 @@ import { PeliculasService } from '../../../core/services/peliculas.service';
 import { ToastService } from '../../../core/services/toast.service';
 import { mensajeDeError } from '../../../core/utils/error.util';
 import { FormatoPelicula, Genero } from '../../../core/models/database.types';
+import { SelectorFecha } from '../../../shared/selector-fecha/selector-fecha';
 
 @Component({
   selector: 'app-pelicula-form',
   standalone: true,
-  imports: [ReactiveFormsModule],
+  imports: [ReactiveFormsModule, SelectorFecha],
   templateUrl: './pelicula-form.html',
   styleUrl: './pelicula-form.scss',
 })

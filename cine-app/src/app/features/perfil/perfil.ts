@@ -15,13 +15,14 @@ import { calcularEdad } from '../../core/utils/edad.util';
 import { generarEntradaPdf } from '../../core/utils/entrada-pdf.util';
 import { mensajeDeError } from '../../core/utils/error.util';
 import { Canje, Compra, Recompensa } from '../../core/models/database.types';
+import { SelectorFecha } from '../../shared/selector-fecha/selector-fecha';
 
 type EstadoGuardado = 'inicial' | 'guardando' | 'guardado' | 'error';
 
 @Component({
   selector: 'app-perfil',
   standalone: true,
-  imports: [ReactiveFormsModule, DatePipe],
+  imports: [ReactiveFormsModule, DatePipe, SelectorFecha],
   templateUrl: './perfil.html',
   styleUrl: './perfil.scss',
 })

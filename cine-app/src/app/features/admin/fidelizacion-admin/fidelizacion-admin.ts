@@ -6,11 +6,12 @@ import { RecompensasService } from '../../../core/services/recompensas.service';
 import { ToastService } from '../../../core/services/toast.service';
 import { mensajeDeError } from '../../../core/utils/error.util';
 import { Cupon, Recompensa } from '../../../core/models/database.types';
+import { SelectorFecha } from '../../../shared/selector-fecha/selector-fecha';
 
 @Component({
   selector: 'app-fidelizacion-admin',
   standalone: true,
-  imports: [ReactiveFormsModule, DatePipe],
+  imports: [ReactiveFormsModule, DatePipe, SelectorFecha],
   templateUrl: './fidelizacion-admin.html',
   styleUrl: './fidelizacion-admin.scss',
 })

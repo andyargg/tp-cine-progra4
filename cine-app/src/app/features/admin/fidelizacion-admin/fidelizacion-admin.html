@@ -25,12 +25,12 @@
 
         <label>
           Vigente desde
-          <input type="date" formControlName="vigencia_desde" />
+          <app-selector-fecha formControlName="vigencia_desde" modo="fecha" />
         </label>
 
         <label>
           Vigente hasta (opcional)
-          <input type="date" formControlName="vigencia_hasta" />
+          <app-selector-fecha formControlName="vigencia_hasta" modo="fecha" />
         </label>
 
         <button type="submit" [disabled]="guardandoCupon()">

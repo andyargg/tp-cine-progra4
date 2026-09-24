@@ -2,6 +2,7 @@ import { Component, inject, signal } from '@angular/core';
 import { ReactiveFormsModule, FormBuilder, Validators, AbstractControl, ValidationErrors } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
+import { SelectorFecha } from '../../../shared/selector-fecha/selector-fecha';
 
 type EstadoRegistro = 'inicial' | 'enviando' | 'confirmacion_pendiente' | 'error';
 
@@ -14,7 +15,7 @@ function passwordsCoincidentesValidator(control: AbstractControl): ValidationErr
 @Component({
   selector: 'app-registro',
   standalone: true,
-  imports: [ReactiveFormsModule, RouterLink],
+  imports: [ReactiveFormsModule, RouterLink, SelectorFecha],
   templateUrl: './registro.html',
   styleUrl: './registro.scss',
 })

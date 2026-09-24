@@ -7,6 +7,7 @@ import { SalasService } from '../../../core/services/salas.service';
 import { ToastService } from '../../../core/services/toast.service';
 import { mensajeDeError } from '../../../core/utils/error.util';
 import { Funcion, PeliculaConGeneros, Sala } from '../../../core/models/database.types';
+import { SelectorFecha } from '../../../shared/selector-fecha/selector-fecha';
 
 interface DiaSemana {
   label: string;
@@ -26,7 +27,7 @@ const DIAS_SEMANA: DiaSemana[] = [
 @Component({
   selector: 'app-funciones-admin',
   standalone: true,
-  imports: [ReactiveFormsModule, DatePipe],
+  imports: [ReactiveFormsModule, DatePipe, SelectorFecha],
   templateUrl: './funciones-admin.html',
   styleUrl: './funciones-admin.scss',
 })
