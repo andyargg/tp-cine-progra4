@@ -32,6 +32,6 @@ _Pendiente — se va a completar a medida que avancen los sprints (ver [02-sprin
 - [x] Sprint 5 — Candy bar y combos
 - [x] Sprint 6 — Cupones y programa de fidelización
 - [x] Sprint 7 — Reseñas y "Mis películas"
-- [ ] Sprint 8 — Panel de administración y reportes
+- [x] Sprint 8 — Panel de administración y reportes
 - [ ] Sprint 9 — App de empleados
 - [ ] Sprint 10 — PWA, UX final y despliegue
