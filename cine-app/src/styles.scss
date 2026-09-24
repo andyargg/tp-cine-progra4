@@ -38,6 +38,10 @@ body {
   height: 100%;
 }
 
+html {
+  overflow-x: hidden;
+}
+
 body {
   margin: 0;
   background: var(--color-bg);
@@ -45,6 +49,18 @@ body {
   font-family: var(--font-body);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+img {
+  max-width: 100%;
+}
+
+.tabla-scroll {
+  overflow-x: auto;
+}
+
+.tabla-scroll table {
+  min-width: 480px;
 }
 
 h1,

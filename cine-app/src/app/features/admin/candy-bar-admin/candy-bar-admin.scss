@@ -10,12 +10,14 @@
 
 .alta {
   display: flex;
+  flex-wrap: wrap;
   gap: var(--space-3);
   margin-bottom: var(--space-4);
 }
 
 .alta input {
   flex: 1;
+  min-width: 180px;
 }
 
 .form-card {

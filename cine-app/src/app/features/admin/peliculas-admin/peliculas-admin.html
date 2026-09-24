@@ -9,29 +9,31 @@
   } @else if (peliculas().length === 0) {
     <p>Todavía no hay películas cargadas.</p>
   } @else {
-    <table>
-      <thead>
-        <tr>
-          <th>Nombre</th>
-          <th>Formato</th>
-          <th>Duración</th>
-          <th>Restricción</th>
-          <th></th>
-        </tr>
-      </thead>
-      <tbody>
-        @for (pelicula of peliculas(); track pelicula.id) {
+    <div class="tabla-scroll">
+      <table>
+        <thead>
           <tr>
-            <td>{{ pelicula.nombre }}</td>
-            <td>{{ pelicula.formato }}</td>
-            <td>{{ pelicula.duracion_minutos }} min</td>
-            <td>{{ pelicula.restriccion_edad > 0 ? '+' + pelicula.restriccion_edad : '-' }}</td>
-            <td>
-              <a [routerLink]="['/admin/peliculas', pelicula.id, 'editar']">Editar</a>
-            </td>
+            <th>Nombre</th>
+            <th>Formato</th>
+            <th>Duración</th>
+            <th>Restricción</th>
+            <th></th>
           </tr>
-        }
-      </tbody>
-    </table>
+        </thead>
+        <tbody>
+          @for (pelicula of peliculas(); track pelicula.id) {
+            <tr>
+              <td>{{ pelicula.nombre }}</td>
+              <td>{{ pelicula.formato }}</td>
+              <td>{{ pelicula.duracion_minutos }} min</td>
+              <td>{{ pelicula.restriccion_edad > 0 ? '+' + pelicula.restriccion_edad : '-' }}</td>
+              <td>
+                <a [routerLink]="['/admin/peliculas', pelicula.id, 'editar']">Editar</a>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
   }
 </section>

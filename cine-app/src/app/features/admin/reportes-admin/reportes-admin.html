@@ -16,24 +16,26 @@
       @if (facturacion().length === 0) {
         <p class="vacio">Todavía no hay compras confirmadas.</p>
       } @else {
-        <table>
-          <thead>
-            <tr>
-              <th>Día</th>
-              <th>Total facturado</th>
-              <th>Entradas vendidas</th>
-            </tr>
-          </thead>
-          <tbody>
-            @for (fila of facturacion(); track fila.dia) {
+        <div class="tabla-scroll">
+          <table>
+            <thead>
               <tr>
-                <td>{{ fila.dia | date: 'd/M/yy' }}</td>
-                <td>${{ fila.total_facturado }}</td>
-                <td>{{ fila.entradas_vendidas }}</td>
+                <th>Día</th>
+                <th>Total facturado</th>
+                <th>Entradas vendidas</th>
               </tr>
-            }
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              @for (fila of facturacion(); track fila.dia) {
+                <tr>
+                  <td>{{ fila.dia | date: 'd/M/yy' }}</td>
+                  <td>${{ fila.total_facturado }}</td>
+                  <td>{{ fila.entradas_vendidas }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
       }
     </section>
 
@@ -76,22 +78,24 @@
       @if (logs().length === 0) {
         <p class="vacio">Todavía no hay actividad registrada.</p>
       } @else {
-        <table>
-          <thead>
-            <tr>
-              <th>Acción</th>
-              <th>Fecha</th>
-            </tr>
-          </thead>
-          <tbody>
-            @for (log of logs(); track log.id) {
+        <div class="tabla-scroll">
+          <table>
+            <thead>
               <tr>
-                <td>{{ log.accion }}</td>
-                <td>{{ log.created_at | date: 'd/M/yy HH:mm' }}</td>
+                <th>Acción</th>
+                <th>Fecha</th>
               </tr>
-            }
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              @for (log of logs(); track log.id) {
+                <tr>
+                  <td>{{ log.accion }}</td>
+                  <td>{{ log.created_at | date: 'd/M/yy HH:mm' }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
       }
     </section>
   }

@@ -62,24 +62,26 @@
         </div>
       </form>
 
-      <table>
-        <thead>
-          <tr>
-            <th>Nombre</th>
-            <th>Precio</th>
-            <th></th>
-          </tr>
-        </thead>
-        <tbody>
-          @for (producto of productos(); track producto.id) {
+      <div class="tabla-scroll">
+        <table>
+          <thead>
             <tr>
-              <td>{{ producto.nombre }}</td>
-              <td>${{ producto.precio }}</td>
-              <td><a (click)="editarProducto(producto)">Editar</a></td>
+              <th>Nombre</th>
+              <th>Precio</th>
+              <th></th>
             </tr>
-          }
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            @for (producto of productos(); track producto.id) {
+              <tr>
+                <td>{{ producto.nombre }}</td>
+                <td>${{ producto.precio }}</td>
+                <td><a (click)="editarProducto(producto)">Editar</a></td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
     </section>
 
     <section class="bloque">

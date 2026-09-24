@@ -58,25 +58,27 @@
   } @else if (proximas().length === 0) {
     <p>No hay funciones programadas.</p>
   } @else {
-    <table>
-      <thead>
-        <tr>
-          <th>Película</th>
-          <th>Sala</th>
-          <th>Inicio</th>
-          <th>Precio</th>
-        </tr>
-      </thead>
-      <tbody>
-        @for (funcion of proximas(); track funcion.id) {
+    <div class="tabla-scroll">
+      <table>
+        <thead>
           <tr>
-            <td>{{ nombrePelicula(funcion.pelicula_id) }}</td>
-            <td>{{ nombreSala(funcion.sala_id) }}</td>
-            <td>{{ funcion.inicio | date: 'EEE d/M HH:mm' }}</td>
-            <td>${{ funcion.precio_base }}</td>
+            <th>Película</th>
+            <th>Sala</th>
+            <th>Inicio</th>
+            <th>Precio</th>
           </tr>
-        }
-      </tbody>
-    </table>
+        </thead>
+        <tbody>
+          @for (funcion of proximas(); track funcion.id) {
+            <tr>
+              <td>{{ nombrePelicula(funcion.pelicula_id) }}</td>
+              <td>{{ nombreSala(funcion.sala_id) }}</td>
+              <td>{{ funcion.inicio | date: 'EEE d/M HH:mm' }}</td>
+              <td>${{ funcion.precio_base }}</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
   }
 </section>

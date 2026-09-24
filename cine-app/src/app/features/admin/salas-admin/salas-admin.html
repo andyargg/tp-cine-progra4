@@ -17,27 +17,29 @@
   } @else if (salas().length === 0) {
     <p>Todavía no hay salas cargadas.</p>
   } @else {
-    <table>
-      <thead>
-        <tr>
-          <th>Nombre</th>
-          <th>Estado</th>
-          <th></th>
-        </tr>
-      </thead>
-      <tbody>
-        @for (sala of salas(); track sala.id) {
+    <div class="tabla-scroll">
+      <table>
+        <thead>
           <tr>
-            <td>{{ sala.nombre }}</td>
-            <td>{{ sala.activa ? 'Activa' : 'Inactiva' }}</td>
-            <td>
-              <button type="button" (click)="alternarActiva(sala)">
-                {{ sala.activa ? 'Desactivar' : 'Activar' }}
-              </button>
-            </td>
+            <th>Nombre</th>
+            <th>Estado</th>
+            <th></th>
           </tr>
-        }
-      </tbody>
-    </table>
+        </thead>
+        <tbody>
+          @for (sala of salas(); track sala.id) {
+            <tr>
+              <td>{{ sala.nombre }}</td>
+              <td>{{ sala.activa ? 'Activa' : 'Inactiva' }}</td>
+              <td>
+                <button type="button" (click)="alternarActiva(sala)">
+                  {{ sala.activa ? 'Desactivar' : 'Activar' }}
+                </button>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
   }
 </section>

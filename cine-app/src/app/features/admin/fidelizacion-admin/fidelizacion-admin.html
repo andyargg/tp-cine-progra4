@@ -42,37 +42,41 @@
         </button>
       </form>
 
-      <table>
-        <thead>
-          <tr>
-            <th>Código</th>
-            <th>%</th>
-            <th>Edad mín.</th>
-            <th>Vigencia</th>
-            <th>Estado</th>
-            <th></th>
-          </tr>
-        </thead>
-        <tbody>
-          @for (cupon of cupones(); track cupon.id) {
+      <div class="tabla-scroll">
+        <table>
+          <thead>
             <tr>
-              <td>{{ cupon.codigo }}</td>
-              <td>{{ cupon.porcentaje }}%</td>
-              <td>{{ cupon.edad_minima ?? '-' }}</td>
-              <td>
-                {{ cupon.vigencia_desde | date: 'd/M/yy' }} -
-                {{ cupon.vigencia_hasta ? (cupon.vigencia_hasta | date: 'd/M/yy') : 'sin límite' }}
-              </td>
-              <td>{{ cupon.activo ? 'Activo' : 'Inactivo' }}</td>
-              <td>
-                <button type="button" (click)="alternarCupon(cupon)">
-                  {{ cupon.activo ? 'Desactivar' : 'Activar' }}
-                </button>
-              </td>
+              <th>Código</th>
+              <th>%</th>
+              <th>Edad mín.</th>
+              <th>Vigencia</th>
+              <th>Estado</th>
+              <th></th>
             </tr>
-          }
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            @for (cupon of cupones(); track cupon.id) {
+              <tr>
+                <td>{{ cupon.codigo }}</td>
+                <td>{{ cupon.porcentaje }}%</td>
+                <td>{{ cupon.edad_minima ?? '-' }}</td>
+                <td>
+                  {{ cupon.vigencia_desde | date: 'd/M/yy' }} -
+                  {{
+                    cupon.vigencia_hasta ? (cupon.vigencia_hasta | date: 'd/M/yy') : 'sin límite'
+                  }}
+                </td>
+                <td>{{ cupon.activo ? 'Activo' : 'Inactivo' }}</td>
+                <td>
+                  <button type="button" (click)="alternarCupon(cupon)">
+                    {{ cupon.activo ? 'Desactivar' : 'Activar' }}
+                  </button>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
     </section>
 
     <section class="bloque">
@@ -103,30 +107,32 @@
         </button>
       </form>
 
-      <table>
-        <thead>
-          <tr>
-            <th>Nombre</th>
-            <th>Puntos</th>
-            <th>Estado</th>
-            <th></th>
-          </tr>
-        </thead>
-        <tbody>
-          @for (recompensa of recompensas(); track recompensa.id) {
+      <div class="tabla-scroll">
+        <table>
+          <thead>
             <tr>
-              <td>{{ recompensa.nombre }}</td>
-              <td>{{ recompensa.costo_puntos }}</td>
-              <td>{{ recompensa.activa ? 'Activa' : 'Inactiva' }}</td>
-              <td>
-                <button type="button" (click)="alternarRecompensa(recompensa)">
-                  {{ recompensa.activa ? 'Desactivar' : 'Activar' }}
-                </button>
-              </td>
+              <th>Nombre</th>
+              <th>Puntos</th>
+              <th>Estado</th>
+              <th></th>
             </tr>
-          }
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            @for (recompensa of recompensas(); track recompensa.id) {
+              <tr>
+                <td>{{ recompensa.nombre }}</td>
+                <td>{{ recompensa.costo_puntos }}</td>
+                <td>{{ recompensa.activa ? 'Activa' : 'Inactiva' }}</td>
+                <td>
+                  <button type="button" (click)="alternarRecompensa(recompensa)">
+                    {{ recompensa.activa ? 'Desactivar' : 'Activar' }}
+                  </button>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
     </section>
   }
 </section>
