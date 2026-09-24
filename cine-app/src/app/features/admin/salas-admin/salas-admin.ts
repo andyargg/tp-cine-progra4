@@ -30,8 +30,13 @@ export class SalasAdmin {
   }
 
   private async cargar(): Promise<void> {
-    this.salas.set(await this.salasService.listar());
-    this.cargando.set(false);
+    try {
+      this.salas.set(await this.salasService.listar());
+    } catch (err) {
+      this.toastService.error(mensajeDeError(err, 'No se pudieron cargar las salas.'));
+    } finally {
+      this.cargando.set(false);
+    }
   }
 
   async crear(): Promise<void> {

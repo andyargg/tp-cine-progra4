@@ -45,14 +45,19 @@ export class FidelizacionAdmin {
   }
 
   private async cargar(): Promise<void> {
-    const [cupones, recompensas] = await Promise.all([
-      this.cuponesService.listar(),
-      this.recompensasService.listarTodas(),
-    ]);
+    try {
+      const [cupones, recompensas] = await Promise.all([
+        this.cuponesService.listar(),
+        this.recompensasService.listarTodas(),
+      ]);
 
-    this.cupones.set(cupones);
-    this.recompensas.set(recompensas);
-    this.cargando.set(false);
+      this.cupones.set(cupones);
+      this.recompensas.set(recompensas);
+    } catch (err) {
+      this.toastService.error(mensajeDeError(err, 'No se pudieron cargar los cupones.'));
+    } finally {
+      this.cargando.set(false);
+    }
   }
 
   async crearCupon(): Promise<void> {

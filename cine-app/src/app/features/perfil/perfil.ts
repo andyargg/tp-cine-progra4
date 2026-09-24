@@ -138,15 +138,21 @@ export class Perfil {
   }
 
   async descargarEntrada(compra: Compra): Promise<void> {
+    const ventana = window.open('', '_blank');
+
     try {
       const entradas = await this.comprasService.listarEntradasDeCompra(compra.id);
       if (entradas.length === 0) {
+        ventana?.close();
         this.toastService.error('Esta compra no tiene entradas asociadas.');
         return;
       }
 
       const funcion = await this.funcionesService.obtenerPorId(entradas[0].funcion_id);
-      if (!funcion) return;
+      if (!funcion) {
+        ventana?.close();
+        return;
+      }
 
       const [pelicula, sala, butacas, productosCompra] = await Promise.all([
         this.peliculasService.obtenerPorId(funcion.pelicula_id),
@@ -155,7 +161,10 @@ export class Perfil {
         this.comprasService.listarProductosDeCompra(compra.id),
       ]);
 
-      if (!pelicula || !sala) return;
+      if (!pelicula || !sala) {
+        ventana?.close();
+        return;
+      }
 
       const candyBar = await this.candyBarService.nombrarItemsDeCompra(productosCompra);
 
@@ -168,8 +177,10 @@ export class Perfil {
         butacas: butacas.map((b) => ({ fila: b.fila, columna: b.columna })),
         candyBar,
         total: compra.total,
+        ventana,
       });
     } catch (err) {
+      ventana?.close();
       this.toastService.error(mensajeDeError(err, 'No se pudo generar el PDF.'));
     }
   }

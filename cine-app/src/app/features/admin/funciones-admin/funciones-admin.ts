@@ -73,16 +73,21 @@ export class FuncionesAdmin {
   }
 
   private async cargar(): Promise<void> {
-    const [peliculas, salas, proximas] = await Promise.all([
-      this.peliculasService.listarActivas(),
-      this.salasService.listar(),
-      this.funcionesService.listarProximas(),
-    ]);
+    try {
+      const [peliculas, salas, proximas] = await Promise.all([
+        this.peliculasService.listarActivas(),
+        this.salasService.listar(),
+        this.funcionesService.listarProximas(),
+      ]);
 
-    this.peliculas.set(peliculas);
-    this.salas.set(salas);
-    this.proximas.set(proximas);
-    this.cargando.set(false);
+      this.peliculas.set(peliculas);
+      this.salas.set(salas);
+      this.proximas.set(proximas);
+    } catch (err) {
+      this.toastService.error(mensajeDeError(err, 'No se pudieron cargar las funciones.'));
+    } finally {
+      this.cargando.set(false);
+    }
   }
 
   async crear(): Promise<void> {

@@ -1,6 +1,8 @@
 import { Component, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { PeliculasService } from '../../../core/services/peliculas.service';
+import { ToastService } from '../../../core/services/toast.service';
+import { mensajeDeError } from '../../../core/utils/error.util';
 import { PeliculaConGeneros } from '../../../core/models/database.types';
 
 @Component({
@@ -12,6 +14,7 @@ import { PeliculaConGeneros } from '../../../core/models/database.types';
 })
 export class PeliculasAdmin {
   private readonly peliculasService = inject(PeliculasService);
+  private readonly toastService = inject(ToastService);
 
   protected readonly peliculas = signal<PeliculaConGeneros[]>([]);
   protected readonly cargando = signal(true);
@@ -21,7 +24,12 @@ export class PeliculasAdmin {
   }
 
   private async cargar(): Promise<void> {
-    this.peliculas.set(await this.peliculasService.listarActivas());
-    this.cargando.set(false);
+    try {
+      this.peliculas.set(await this.peliculasService.listarActivas());
+    } catch (err) {
+      this.toastService.error(mensajeDeError(err, 'No se pudieron cargar las películas.'));
+    } finally {
+      this.cargando.set(false);
+    }
   }
 }

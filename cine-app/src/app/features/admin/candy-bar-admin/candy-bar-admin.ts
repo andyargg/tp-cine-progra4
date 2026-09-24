@@ -56,20 +56,26 @@ export class CandyBarAdmin {
   }
 
   private async cargar(): Promise<void> {
-    const [categorias, productos, combos] = await Promise.all([
-      this.candyBarService.listarCategorias(),
-      this.candyBarService.listarProductosActivos(),
-      this.candyBarService.listarCombosActivos(),
-    ]);
+    try {
+      const [categorias, productos, combos] = await Promise.all([
+        this.candyBarService.listarCategorias(),
+        this.candyBarService.listarProductosActivos(),
+        this.candyBarService.listarCombosActivos(),
+      ]);
 
-    this.categorias.set(categorias);
-    this.productos.set(productos);
-    this.combos.set(combos);
+      this.categorias.set(categorias);
+      this.productos.set(productos);
+      this.combos.set(combos);
 
-    this.productosArray.clear();
-    productos.forEach(() => this.productosArray.push(this.fb.control(false, { nonNullable: true })));
-
-    this.cargando.set(false);
+      this.productosArray.clear();
+      productos.forEach(() =>
+        this.productosArray.push(this.fb.control(false, { nonNullable: true })),
+      );
+    } catch (err) {
+      this.toastService.error(mensajeDeError(err, 'No se pudo cargar el candy bar.'));
+    } finally {
+      this.cargando.set(false);
+    }
   }
 
   async crearCategoria(): Promise<void> {

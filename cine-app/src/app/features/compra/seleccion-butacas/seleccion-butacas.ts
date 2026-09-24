@@ -215,6 +215,8 @@ export class SeleccionButacas implements OnDestroy {
   async confirmar(): Promise<void> {
     if (!this.puedeConfirmar()) return;
 
+    const ventanaEntrada = window.open('', '_blank');
+
     this.procesando.set(true);
     const butacasElegidas = this.butacasSeleccionadas();
     const candyBar = this.itemsCandyPdf();
@@ -239,22 +241,28 @@ export class SeleccionButacas implements OnDestroy {
         candyBar,
       });
 
-      await this.descargarPdf();
+      await this.descargarPdf(ventanaEntrada);
       this.toastService.exito('¡Compra confirmada! Descargamos tu entrada en PDF.');
     } catch (err) {
+      ventanaEntrada?.close();
       this.toastService.error(mensajeDeError(err, 'No se pudo confirmar la compra.'));
     } finally {
       this.procesando.set(false);
     }
   }
 
-  async descargarPdf(): Promise<void> {
+  async descargarPdf(ventana?: Window | null): Promise<void> {
+    const ventanaEntrada = ventana === undefined ? window.open('', '_blank') : ventana;
+
     const compra = this.compraConfirmada();
     const pelicula = this.pelicula();
     const funcion = this.funcion();
     const sala = this.sala();
 
-    if (!compra || !pelicula || !funcion || !sala) return;
+    if (!compra || !pelicula || !funcion || !sala) {
+      ventanaEntrada?.close();
+      return;
+    }
 
     await generarEntradaPdf({
       compraId: compra.compraId,
@@ -265,67 +273,72 @@ export class SeleccionButacas implements OnDestroy {
       butacas: compra.butacas,
       candyBar: compra.candyBar,
       total: compra.total,
+      ventana: ventanaEntrada,
     });
   }
 
   private async cargar(): Promise<void> {
-    const funcion = await this.funcionesService.obtenerPorId(this.funcionId);
+    try {
+      const funcion = await this.funcionesService.obtenerPorId(this.funcionId);
 
-    if (!funcion) {
-      this.toastService.error('No se encontró la función.');
-      this.router.navigateByUrl('/peliculas');
-      return;
-    }
-
-    this.funcion.set(funcion);
-
-    const [pelicula, sala] = await Promise.all([
-      this.peliculasService.obtenerPorId(funcion.pelicula_id),
-      this.salasService.obtenerPorId(funcion.sala_id),
-    ]);
-
-    this.pelicula.set(pelicula);
-    this.sala.set(sala);
-
-    if (pelicula) {
-      this.precioUnitario.set(
-        calcularPrecioVigente(
-          funcion.precio_base,
-          pelicula.preventa_apertura,
-          pelicula.preventa_precio,
-          pelicula.estreno_fecha,
-          new Date(),
-        ),
-      );
-
-      if (pelicula.restriccion_edad > 0) {
-        this.toastService.info(
-          `Esta función es +${pelicula.restriccion_edad}. Los menores deben ir acompañados de un adulto.`,
-        );
+      if (!funcion) {
+        this.toastService.error('No se encontró la función.');
+        this.router.navigateByUrl('/peliculas');
+        return;
       }
+
+      this.funcion.set(funcion);
+
+      const [pelicula, sala] = await Promise.all([
+        this.peliculasService.obtenerPorId(funcion.pelicula_id),
+        this.salasService.obtenerPorId(funcion.sala_id),
+      ]);
+
+      this.pelicula.set(pelicula);
+      this.sala.set(sala);
+
+      if (pelicula) {
+        this.precioUnitario.set(
+          calcularPrecioVigente(
+            funcion.precio_base,
+            pelicula.preventa_apertura,
+            pelicula.preventa_precio,
+            pelicula.estreno_fecha,
+            new Date(),
+          ),
+        );
+
+        if (pelicula.restriccion_edad > 0) {
+          this.toastService.info(
+            `Esta función es +${pelicula.restriccion_edad}. Los menores deben ir acompañados de un adulto.`,
+          );
+        }
+      }
+
+      if (sala) {
+        this.butacas.set(await this.butacasService.listarPorSala(sala.id));
+      }
+
+      const [productosCandy, combosCandy] = await Promise.all([
+        this.candyBarService.listarProductosActivos(),
+        this.candyBarService.listarCombosActivos(),
+      ]);
+      this.productosCandy.set(productosCandy);
+      this.combosCandy.set(combosCandy);
+
+      await this.cargarBufferConfig();
+      await this.actualizarEstadoOcupacion();
+
+      this.canal = this.butacasService.suscribirse(this.funcionId, () => {
+        this.actualizarEstadoOcupacion();
+      });
+
+      this.intervalo = setInterval(() => this.actualizarEstadoOcupacion(), 30000);
+    } catch (err) {
+      this.toastService.error(mensajeDeError(err, 'No se pudo cargar la función.'));
+    } finally {
+      this.cargando.set(false);
     }
-
-    if (sala) {
-      this.butacas.set(await this.butacasService.listarPorSala(sala.id));
-    }
-
-    const [productosCandy, combosCandy] = await Promise.all([
-      this.candyBarService.listarProductosActivos(),
-      this.candyBarService.listarCombosActivos(),
-    ]);
-    this.productosCandy.set(productosCandy);
-    this.combosCandy.set(combosCandy);
-
-    await this.cargarBufferConfig();
-    await this.actualizarEstadoOcupacion();
-
-    this.canal = this.butacasService.suscribirse(this.funcionId, () => {
-      this.actualizarEstadoOcupacion();
-    });
-
-    this.intervalo = setInterval(() => this.actualizarEstadoOcupacion(), 30000);
-
-    this.cargando.set(false);
   }
 
   private async cargarBufferConfig(): Promise<void> {

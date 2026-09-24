@@ -15,6 +15,7 @@ export interface DatosEntradaPdf {
   butacas: { fila: string; columna: number }[];
   candyBar?: ItemCandyBarPdf[];
   total: number;
+  ventana?: Window | null;
 }
 
 export async function generarEntradaPdf(datos: DatosEntradaPdf): Promise<void> {
@@ -50,5 +51,9 @@ export async function generarEntradaPdf(datos: DatosEntradaPdf): Promise<void> {
 
   doc.addImage(qrDataUrl, 'PNG', 20, y + 12, 60, 60);
 
-  doc.save(`entrada-${datos.compraId}.pdf`);
+  if (datos.ventana) {
+    datos.ventana.location.href = doc.output('bloburl').toString();
+  } else {
+    doc.save(`entrada-${datos.compraId}.pdf`);
+  }
 }

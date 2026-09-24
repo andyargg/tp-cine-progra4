@@ -5,7 +5,9 @@ import { RouterLink } from '@angular/router';
 import { PeliculasService } from '../../../core/services/peliculas.service';
 import { FuncionesService } from '../../../core/services/funciones.service';
 import { SalasService } from '../../../core/services/salas.service';
+import { ToastService } from '../../../core/services/toast.service';
 import { calcularPrecioVigente } from '../../../core/utils/funciones.util';
+import { mensajeDeError } from '../../../core/utils/error.util';
 import { Funcion, Genero, PeliculaConGeneros } from '../../../core/models/database.types';
 
 interface HorarioMostrado {
@@ -25,6 +27,7 @@ export class Catalogo {
   private readonly peliculasService = inject(PeliculasService);
   private readonly funcionesService = inject(FuncionesService);
   private readonly salasService = inject(SalasService);
+  private readonly toastService = inject(ToastService);
 
   protected readonly peliculas = signal<PeliculaConGeneros[]>([]);
   protected readonly generos = signal<Genero[]>([]);
@@ -54,39 +57,44 @@ export class Catalogo {
   }
 
   private async cargar(): Promise<void> {
-    const [peliculas, generos, salas] = await Promise.all([
-      this.peliculasService.listarActivas(),
-      this.peliculasService.listarGeneros(),
-      this.salasService.listar(),
-    ]);
+    try {
+      const [peliculas, generos, salas] = await Promise.all([
+        this.peliculasService.listarActivas(),
+        this.peliculasService.listarGeneros(),
+        this.salasService.listar(),
+      ]);
 
-    this.peliculas.set(peliculas);
-    this.generos.set(generos);
+      this.peliculas.set(peliculas);
+      this.generos.set(generos);
 
-    const funciones = await this.funcionesService.listarFuturasPorPeliculas(
-      peliculas.map((p) => p.id),
-    );
-
-    const ahora = new Date();
-    const mapa = new Map<string, HorarioMostrado[]>();
-
-    for (const funcion of funciones) {
-      const pelicula = peliculas.find((p) => p.id === funcion.pelicula_id);
-      const precioVigente = calcularPrecioVigente(
-        funcion.precio_base,
-        pelicula?.preventa_apertura ?? null,
-        pelicula?.preventa_precio ?? null,
-        pelicula?.estreno_fecha ?? null,
-        ahora,
+      const funciones = await this.funcionesService.listarFuturasPorPeliculas(
+        peliculas.map((p) => p.id),
       );
-      const nombreSala = salas.find((s) => s.id === funcion.sala_id)?.nombre ?? '';
 
-      const lista = mapa.get(funcion.pelicula_id) ?? [];
-      lista.push({ funcion, precioVigente, nombreSala });
-      mapa.set(funcion.pelicula_id, lista);
+      const ahora = new Date();
+      const mapa = new Map<string, HorarioMostrado[]>();
+
+      for (const funcion of funciones) {
+        const pelicula = peliculas.find((p) => p.id === funcion.pelicula_id);
+        const precioVigente = calcularPrecioVigente(
+          funcion.precio_base,
+          pelicula?.preventa_apertura ?? null,
+          pelicula?.preventa_precio ?? null,
+          pelicula?.estreno_fecha ?? null,
+          ahora,
+        );
+        const nombreSala = salas.find((s) => s.id === funcion.sala_id)?.nombre ?? '';
+
+        const lista = mapa.get(funcion.pelicula_id) ?? [];
+        lista.push({ funcion, precioVigente, nombreSala });
+        mapa.set(funcion.pelicula_id, lista);
+      }
+
+      this.funcionesPorPelicula.set(mapa);
+    } catch (err) {
+      this.toastService.error(mensajeDeError(err, 'No se pudo cargar la cartelera.'));
+    } finally {
+      this.cargando.set(false);
     }
-
-    this.funcionesPorPelicula.set(mapa);
-    this.cargando.set(false);
   }
 }
