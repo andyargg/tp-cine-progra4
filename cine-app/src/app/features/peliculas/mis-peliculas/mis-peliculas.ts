@@ -3,6 +3,8 @@ import { RouterLink } from '@angular/router';
 import { DatePipe } from '@angular/common';
 import { ComprasService } from '../../../core/services/compras.service';
 import { ResenasService } from '../../../core/services/resenas.service';
+import { ToastService } from '../../../core/services/toast.service';
+import { mensajeDeError } from '../../../core/utils/error.util';
 import { Pelicula, Resena } from '../../../core/models/database.types';
 
 interface PeliculaVista {
@@ -21,6 +23,7 @@ interface PeliculaVista {
 export class MisPeliculas {
   private readonly comprasService = inject(ComprasService);
   private readonly resenasService = inject(ResenasService);
+  private readonly toastService = inject(ToastService);
 
   protected readonly peliculas = signal<PeliculaVista[]>([]);
   protected readonly cargando = signal(true);
@@ -30,19 +33,23 @@ export class MisPeliculas {
   }
 
   private async cargar(): Promise<void> {
-    const [vistas, misResenas] = await Promise.all([
-      this.comprasService.listarPeliculasVistas(),
-      this.resenasService.misResenas(),
-    ]);
+    try {
+      const [vistas, misResenas] = await Promise.all([
+        this.comprasService.listarPeliculasVistas(),
+        this.resenasService.misResenas(),
+      ]);
 
-    this.peliculas.set(
-      vistas.map((v) => ({
-        pelicula: v.pelicula,
-        fecha: v.fecha,
-        miResena: misResenas.get(v.pelicula.id) ?? null,
-      })),
-    );
-
-    this.cargando.set(false);
+      this.peliculas.set(
+        vistas.map((v) => ({
+          pelicula: v.pelicula,
+          fecha: v.fecha,
+          miResena: misResenas.get(v.pelicula.id) ?? null,
+        })),
+      );
+    } catch (err) {
+      this.toastService.error(mensajeDeError(err, 'No se pudo cargar tus películas.'));
+    } finally {
+      this.cargando.set(false);
+    }
   }
 }

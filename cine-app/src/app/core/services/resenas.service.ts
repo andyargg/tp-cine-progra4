@@ -26,7 +26,7 @@ export class ResenasService {
       .eq('pelicula_id', peliculaId)
       .maybeSingle();
 
-    if (error) return null;
+    if (error) throw error;
     return data;
   }
 
@@ -38,7 +38,7 @@ export class ResenasService {
       .select('*')
       .in('pelicula_id', peliculaIds);
 
-    if (error) return new Map();
+    if (error) throw error;
     return new Map((data ?? []).map((r) => [r.pelicula_id, r]));
   }
 
@@ -67,7 +67,7 @@ export class ResenasService {
       .eq('usuario_id', usuario.id)
       .maybeSingle();
 
-    if (error) return null;
+    if (error) throw error;
     return data;
   }
 
@@ -80,7 +80,7 @@ export class ResenasService {
       .select('*')
       .eq('usuario_id', usuario.id);
 
-    if (error) return new Map();
+    if (error) throw error;
     return new Map((data ?? []).map((r) => [r.pelicula_id, r]));
   }
 
@@ -97,7 +97,7 @@ export class ResenasService {
       .lt('funciones.inicio', new Date().toISOString())
       .limit(1);
 
-    if (error) return false;
+    if (error) throw error;
     return (data ?? []).length > 0;
   }
 }

@@ -60,7 +60,8 @@ export class PeliculasService {
       .order('entradas_vendidas', { ascending: false })
       .limit(limite);
 
-    if (error || !ventas || ventas.length === 0) return [];
+    if (error) throw error;
+    if (!ventas || ventas.length === 0) return [];
 
     const ids = ventas.map((v) => v.pelicula_id);
 
@@ -70,7 +71,8 @@ export class PeliculasService {
       .in('id', ids)
       .eq('activa', true);
 
-    if (errorPeliculas || !data) return [];
+    if (errorPeliculas) throw errorPeliculas;
+    if (!data) return [];
 
     const mapa = new Map(data.map((p) => [p.id, mapearPeliculaConGeneros(p)]));
     return ids.map((id) => mapa.get(id)).filter((p): p is PeliculaConGeneros => !!p);

@@ -59,45 +59,48 @@ export class PeliculaDetalle {
   }
 
   private async cargar(): Promise<void> {
-    const pelicula = await this.peliculasService.obtenerPorId(this.peliculaId);
+    try {
+      const pelicula = await this.peliculasService.obtenerPorId(this.peliculaId);
 
-    if (!pelicula) {
+      if (!pelicula) {
+        return;
+      }
+
+      this.pelicula.set(pelicula);
+
+      const [promedio, resenas, funciones, salas, miResena, puedeResenar] = await Promise.all([
+        this.resenasService.promedioDe(this.peliculaId),
+        this.resenasService.listarPorPelicula(this.peliculaId),
+        this.funcionesService.listarFuturasPorPeliculas([this.peliculaId]),
+        this.salasService.listar(),
+        this.resenasService.miResenaDe(this.peliculaId),
+        this.resenasService.puedeResenar(this.peliculaId),
+      ]);
+
+      this.promedio.set(promedio);
+      this.resenas.set(resenas);
+      this.miResena.set(miResena);
+      this.puedeResenar.set(puedeResenar && !miResena);
+
+      const ahora = new Date();
+      this.horarios.set(
+        funciones.map((funcion) => ({
+          funcion,
+          precioVigente: calcularPrecioVigente(
+            funcion.precio_base,
+            pelicula.preventa_apertura,
+            pelicula.preventa_precio,
+            pelicula.estreno_fecha,
+            ahora,
+          ),
+          nombreSala: salas.find((s) => s.id === funcion.sala_id)?.nombre ?? '',
+        })),
+      );
+    } catch (err) {
+      this.toastService.error(mensajeDeError(err, 'No se pudo cargar la película.'));
+    } finally {
       this.cargando.set(false);
-      return;
     }
-
-    this.pelicula.set(pelicula);
-
-    const [promedio, resenas, funciones, salas, miResena, puedeResenar] = await Promise.all([
-      this.resenasService.promedioDe(this.peliculaId),
-      this.resenasService.listarPorPelicula(this.peliculaId),
-      this.funcionesService.listarFuturasPorPeliculas([this.peliculaId]),
-      this.salasService.listar(),
-      this.resenasService.miResenaDe(this.peliculaId),
-      this.resenasService.puedeResenar(this.peliculaId),
-    ]);
-
-    this.promedio.set(promedio);
-    this.resenas.set(resenas);
-    this.miResena.set(miResena);
-    this.puedeResenar.set(puedeResenar && !miResena);
-
-    const ahora = new Date();
-    this.horarios.set(
-      funciones.map((funcion) => ({
-        funcion,
-        precioVigente: calcularPrecioVigente(
-          funcion.precio_base,
-          pelicula.preventa_apertura,
-          pelicula.preventa_precio,
-          pelicula.estreno_fecha,
-          ahora,
-        ),
-        nombreSala: salas.find((s) => s.id === funcion.sala_id)?.nombre ?? '',
-      })),
-    );
-
-    this.cargando.set(false);
   }
 
   async enviarResena(): Promise<void> {

@@ -31,16 +31,21 @@ export class Home {
   }
 
   private async cargar(): Promise<void> {
-    const [masVendidas, proximamente, suscripciones] = await Promise.all([
-      this.peliculasService.listarMasVendidas(3),
-      this.peliculasService.listarProximamente(),
-      this.alertasService.listarSuscripciones(),
-    ]);
+    try {
+      const [masVendidas, proximamente, suscripciones] = await Promise.all([
+        this.peliculasService.listarMasVendidas(3),
+        this.peliculasService.listarProximamente(),
+        this.alertasService.listarSuscripciones(),
+      ]);
 
-    this.masVendidas.set(masVendidas);
-    this.proximamente.set(proximamente);
-    this.suscripciones.set(suscripciones);
-    this.cargando.set(false);
+      this.masVendidas.set(masVendidas);
+      this.proximamente.set(proximamente);
+      this.suscripciones.set(suscripciones);
+    } catch (err) {
+      this.toastService.error(mensajeDeError(err, 'No se pudo cargar la página de inicio.'));
+    } finally {
+      this.cargando.set(false);
+    }
   }
 
   async alternarAlerta(peliculaId: string, nombre: string): Promise<void> {
