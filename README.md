@@ -18,6 +18,19 @@ npm install
 npm start
 ```
 
+## Usuarios de prueba
+
+App desplegada: [tp-cine-progra4.vercel.app](https://tp-cine-progra4.vercel.app)
+
+| Rol | Email | Contraseña | Qué puede probar |
+|---|---|---|---|
+| Anónimo | — | — | Cartelera, búsqueda por género, compra sin cuenta (solo películas sin restricción de edad) |
+| Cliente | `cliente@cineapp.com` | `Cine2026!` | Compra con candy bar y cupones, puntos y canjes, cancelación con crédito, reseñas, "Mis películas", alertas de estreno |
+| Empleado | `empleado@cineapp.com` | `Cine2026!` | Validación de QR de entradas y candy bar (`/empleado/validar`) |
+| Admin | `admin@cineapp.com` | `Cine2026!` | Panel de administración: películas, salas, funciones, candy bar, fidelización, reportes y log de actividad |
+
+Las cuentas se crean con [`cine-app/supabase/usuarios_demo.sql`](cine-app/supabase/usuarios_demo.sql).
+
 ## Arquitectura y decisiones técnicas
 
 **Stack**: Angular 22 (standalone components, Signals, control de flujo nativo `@if`/`@for`/`@switch`, sin NgModules) + Supabase (Postgres, Auth, Realtime) + Vercel (deploy continuo desde `master`) + PWA (service worker de Angular).
