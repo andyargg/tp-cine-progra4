@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, computed, effect, inject, signal, untracked } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { PeliculasService } from '../../core/services/peliculas.service';
 import { AlertasService } from '../../core/services/alertas.service';
@@ -25,27 +25,44 @@ export class Home {
   protected readonly suscripciones = signal<Set<string>>(new Set());
   protected readonly cargando = signal(true);
 
+  private readonly usuarioId = computed(() => this.authService.usuarioActual()?.id ?? null);
+
   constructor() {
     this.cargar();
-    this.alertasService.revisarPendientes();
+
+    effect(() => {
+      const usuarioId = this.usuarioId();
+
+      if (!usuarioId) {
+        this.suscripciones.set(new Set());
+        return;
+      }
+
+      untracked(() => {
+        this.cargarSuscripciones();
+        this.alertasService.revisarPendientes();
+      });
+    });
   }
 
   private async cargar(): Promise<void> {
     try {
-      const [masVendidas, proximamente, suscripciones] = await Promise.all([
+      const [masVendidas, proximamente] = await Promise.all([
         this.peliculasService.listarMasVendidas(3),
         this.peliculasService.listarProximamente(),
-        this.alertasService.listarSuscripciones(),
       ]);
 
       this.masVendidas.set(masVendidas);
       this.proximamente.set(proximamente);
-      this.suscripciones.set(suscripciones);
     } catch (err) {
       this.toastService.error(mensajeDeError(err, 'No se pudo cargar la página de inicio.'));
     } finally {
       this.cargando.set(false);
     }
+  }
+
+  private async cargarSuscripciones(): Promise<void> {
+    this.suscripciones.set(await this.alertasService.listarSuscripciones());
   }
 
   async alternarAlerta(peliculaId: string, nombre: string): Promise<void> {

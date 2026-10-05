@@ -28,7 +28,7 @@ export class AlertasService {
 
     const { error } = await this.supabaseService.client
       .from('alertas_estreno')
-      .insert({ usuario_id: usuario.id, pelicula_id: peliculaId });
+      .upsert({ usuario_id: usuario.id, pelicula_id: peliculaId }, { ignoreDuplicates: true });
 
     if (error) throw error;
   }
