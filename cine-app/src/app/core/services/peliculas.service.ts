@@ -12,6 +12,8 @@ interface PeliculaFormValue {
   idioma: string;
   restriccion_edad: number;
   estreno_fecha: string | null;
+  preventa_apertura: string | null;
+  preventa_precio: number | null;
 }
 
 @Injectable({ providedIn: 'root' })

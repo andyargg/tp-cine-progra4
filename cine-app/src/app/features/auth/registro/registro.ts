@@ -3,6 +3,8 @@ import { ReactiveFormsModule, FormBuilder, Validators, AbstractControl, Validati
 import { RouterLink } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
 import { SelectorFecha } from '../../../shared/selector-fecha/selector-fecha';
+import { calcularEdad } from '../../../core/utils/edad.util';
+import { mensajeDeError } from '../../../core/utils/error.util';
 
 type EstadoRegistro = 'inicial' | 'enviando' | 'confirmacion_pendiente' | 'error';
 
@@ -10,6 +12,15 @@ function passwordsCoincidentesValidator(control: AbstractControl): ValidationErr
   const password = control.get('password')?.value;
   const confirmarPassword = control.get('confirmarPassword')?.value;
   return password === confirmarPassword ? null : { passwordsNoCoinciden: true };
+}
+
+function fechaNacimientoValidator(control: AbstractControl): ValidationErrors | null {
+  const valor = control.value as string | null;
+  if (!valor) return null;
+
+  if (new Date(`${valor}T00:00:00`) > new Date()) return { fechaFutura: true };
+  if (calcularEdad(valor) > 120) return { fechaInvalida: true };
+  return null;
 }
 
 @Component({
@@ -28,19 +39,26 @@ export class Registro {
 
   protected readonly form = this.fb.group(
     {
-      nombre: ['', Validators.required],
-      apellido: ['', Validators.required],
+      nombre: ['', [Validators.required, Validators.maxLength(50)]],
+      apellido: ['', [Validators.required, Validators.maxLength(50)]],
       email: ['', [Validators.required, Validators.email]],
-      fechaNacimiento: ['', Validators.required],
+      fechaNacimiento: ['', [Validators.required, fechaNacimientoValidator]],
       password: ['', [Validators.required, Validators.minLength(6)]],
       confirmarPassword: ['', Validators.required],
     },
     { validators: passwordsCoincidentesValidator },
   );
 
+  protected mostrarError(campo: keyof typeof this.form.controls): boolean {
+    const control = this.form.controls[campo];
+    return control.invalid && control.touched;
+  }
+
   async enviar(): Promise<void> {
     if (this.form.invalid) {
       this.form.markAllAsTouched();
+      this.mensajeError.set('Revisá los campos marcados en rojo.');
+      this.estado.set('error');
       return;
     }
 
@@ -56,7 +74,7 @@ export class Registro {
     );
 
     if (error) {
-      this.mensajeError.set(error.message);
+      this.mensajeError.set(mensajeDeError(error, 'No se pudo crear la cuenta. Intentá de nuevo.'));
       this.estado.set('error');
       return;
     }

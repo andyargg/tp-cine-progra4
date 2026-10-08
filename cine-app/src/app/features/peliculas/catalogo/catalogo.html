@@ -51,10 +51,20 @@
             <ul class="horarios">
               @for (horario of horariosDe(pelicula.id); track horario.funcion.id) {
                 <li>
-                  <a [routerLink]="['/funciones', horario.funcion.id, 'butacas']">
-                    {{ horario.funcion.inicio | date: 'EEE d/M HH:mm' }} · {{ horario.nombreSala }}
-                    · ${{ horario.precioVigente }}
-                  </a>
+                  @if (horario.ventaDesde) {
+                    <span class="horario-cerrado">
+                      {{ horario.funcion.inicio | date: 'EEE d/M HH:mm' }} · Venta desde
+                      {{ horario.ventaDesde | date: 'd/M HH:mm' }}
+                    </span>
+                  } @else {
+                    <a [routerLink]="['/funciones', horario.funcion.id, 'butacas']">
+                      {{ horario.funcion.inicio | date: 'EEE d/M HH:mm' }} · {{ horario.nombreSala }}
+                      · ${{ horario.precioVigente }}
+                      @if (horario.enPreventa) {
+                        <strong>· Preventa</strong>
+                      }
+                    </a>
+                  }
                 </li>
               }
             </ul>

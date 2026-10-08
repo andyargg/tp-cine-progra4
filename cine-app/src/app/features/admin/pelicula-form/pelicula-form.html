@@ -54,6 +54,24 @@
         <app-selector-fecha formControlName="estreno_fecha" modo="fecha" />
       </label>
 
+      <fieldset>
+        <legend>Preventa</legend>
+        <label class="checkbox">
+          <input type="checkbox" formControlName="preventa_habilitada" />
+          Abrir la venta antes del estreno con precio especial
+        </label>
+        @if (form.controls.preventa_habilitada.value) {
+          <label>
+            Días antes del estreno
+            <input type="number" formControlName="preventa_dias" min="1" max="30" />
+          </label>
+          <label>
+            Precio especial de preventa
+            <input type="number" formControlName="preventa_precio" min="1" />
+          </label>
+        }
+      </fieldset>
+
       <fieldset formArrayName="generos">
         <legend>Géneros</legend>
         @for (genero of generos(); track genero.id; let i = $index) {

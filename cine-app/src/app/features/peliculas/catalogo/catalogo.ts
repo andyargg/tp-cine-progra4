@@ -6,7 +6,7 @@ import { PeliculasService } from '../../../core/services/peliculas.service';
 import { FuncionesService } from '../../../core/services/funciones.service';
 import { SalasService } from '../../../core/services/salas.service';
 import { ToastService } from '../../../core/services/toast.service';
-import { calcularPrecioVigente } from '../../../core/utils/funciones.util';
+import { calcularPrecioVigente, ventaAbiertaDesde } from '../../../core/utils/funciones.util';
 import { mensajeDeError } from '../../../core/utils/error.util';
 import { Funcion, Genero, PeliculaConGeneros } from '../../../core/models/database.types';
 
@@ -14,6 +14,8 @@ interface HorarioMostrado {
   funcion: Funcion;
   precioVigente: number;
   nombreSala: string;
+  ventaDesde: Date | null;
+  enPreventa: boolean;
 }
 
 @Component({
@@ -86,7 +88,15 @@ export class Catalogo {
         const nombreSala = salas.find((s) => s.id === funcion.sala_id)?.nombre ?? '';
 
         const lista = mapa.get(funcion.pelicula_id) ?? [];
-        lista.push({ funcion, precioVigente, nombreSala });
+        const ventaDesde = ventaAbiertaDesde(
+          pelicula?.estreno_fecha ?? null,
+          pelicula?.preventa_apertura ?? null,
+          ahora,
+        );
+        const enPreventa =
+          !ventaDesde && !!pelicula?.estreno_fecha && ahora < new Date(`${pelicula.estreno_fecha}T00:00:00`);
+
+        lista.push({ funcion, precioVigente, nombreSala, ventaDesde, enPreventa });
         mapa.set(funcion.pelicula_id, lista);
       }
 

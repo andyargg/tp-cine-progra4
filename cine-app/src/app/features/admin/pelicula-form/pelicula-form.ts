@@ -42,6 +42,9 @@ export class PeliculaForm {
     idioma: ['Castellano', Validators.required],
     restriccion_edad: [0, Validators.required],
     estreno_fecha: [''],
+    preventa_habilitada: [false],
+    preventa_precio: [null as number | null, Validators.min(1)],
+    preventa_dias: [7, [Validators.min(1), Validators.max(30)]],
     generos: this.fb.array<FormControl<boolean>>([]),
   });
 
@@ -75,6 +78,9 @@ export class PeliculaForm {
           idioma: pelicula.idioma,
           restriccion_edad: pelicula.restriccion_edad,
           estreno_fecha: pelicula.estreno_fecha ?? '',
+          preventa_habilitada: !!pelicula.preventa_apertura,
+          preventa_precio: pelicula.preventa_precio,
+          preventa_dias: this.diasDePreventa(pelicula.estreno_fecha, pelicula.preventa_apertura),
         });
 
         const idsSeleccionados = new Set(pelicula.generos.map((g) => g.id));
@@ -87,11 +93,33 @@ export class PeliculaForm {
     this.cargando.set(false);
   }
 
+  private diasDePreventa(estreno: string | null, apertura: string | null): number {
+    if (!estreno || !apertura) return 7;
+    const diferencia = new Date(`${estreno}T00:00:00`).getTime() - new Date(apertura).getTime();
+    return Math.max(1, Math.round(diferencia / (24 * 60 * 60 * 1000)));
+  }
+
   async guardar(): Promise<void> {
     if (this.form.invalid) {
       this.form.markAllAsTouched();
       this.toastService.error('Revisá los campos del formulario.');
       return;
+    }
+
+    const preventa = this.form.getRawValue();
+    if (preventa.preventa_habilitada) {
+      if (!preventa.estreno_fecha) {
+        this.toastService.error('Para habilitar la preventa cargá la fecha de estreno.');
+        return;
+      }
+      if (!preventa.preventa_precio || preventa.preventa_precio <= 0) {
+        this.toastService.error('Ingresá el precio especial de preventa.');
+        return;
+      }
+      if (!preventa.preventa_dias || preventa.preventa_dias < 1 || preventa.preventa_dias > 30) {
+        this.toastService.error('Los días de preventa deben estar entre 1 y 30.');
+        return;
+      }
     }
 
     this.guardando.set(true);
@@ -110,6 +138,14 @@ export class PeliculaForm {
       idioma: valores.idioma!,
       restriccion_edad: valores.restriccion_edad!,
       estreno_fecha: valores.estreno_fecha || null,
+      preventa_apertura:
+        valores.preventa_habilitada && valores.estreno_fecha
+          ? new Date(
+              new Date(`${valores.estreno_fecha}T00:00:00`).getTime() -
+                valores.preventa_dias! * 24 * 60 * 60 * 1000,
+            ).toISOString()
+          : null,
+      preventa_precio: valores.preventa_habilitada ? valores.preventa_precio : null,
     };
 
     try {

@@ -52,3 +52,21 @@ export function calcularPrecioVigente(
 
   return precioBase;
 }
+
+export function ventaAbiertaDesde(
+  estrenoFecha: string | null,
+  preventaApertura: string | null,
+  ahora: Date,
+): Date | null {
+  if (!estrenoFecha) return null;
+
+  const estreno = new Date(`${estrenoFecha}T00:00:00`);
+  if (ahora >= estreno) return null;
+
+  if (preventaApertura) {
+    const apertura = new Date(preventaApertura);
+    return ahora >= apertura ? null : apertura;
+  }
+
+  return estreno;
+}

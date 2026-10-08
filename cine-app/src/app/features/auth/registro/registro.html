@@ -16,26 +16,53 @@
           Nombre
           <input type="text" formControlName="nombre" autocomplete="given-name" />
         </label>
+        @if (mostrarError('nombre')) {
+          <p class="mensaje mensaje--error">Ingresá tu nombre.</p>
+        }
 
         <label>
           Apellido
           <input type="text" formControlName="apellido" autocomplete="family-name" />
         </label>
+        @if (mostrarError('apellido')) {
+          <p class="mensaje mensaje--error">Ingresá tu apellido.</p>
+        }
 
         <label>
           Email
           <input type="email" formControlName="email" autocomplete="email" />
         </label>
+        @if (mostrarError('email')) {
+          <p class="mensaje mensaje--error">
+            {{ form.controls.email.errors?.['required'] ? 'Ingresá tu email.' : 'El email no tiene un formato válido.' }}
+          </p>
+        }
 
         <label>
           Fecha de nacimiento
           <app-selector-fecha formControlName="fechaNacimiento" modo="fecha" />
         </label>
+        @if (mostrarError('fechaNacimiento')) {
+          <p class="mensaje mensaje--error">
+            @if (form.controls.fechaNacimiento.errors?.['required']) {
+              Ingresá tu fecha de nacimiento.
+            } @else if (form.controls.fechaNacimiento.errors?.['fechaFutura']) {
+              La fecha de nacimiento no puede ser futura.
+            } @else {
+              La fecha de nacimiento no es válida.
+            }
+          </p>
+        }
 
         <label>
           Contraseña
           <input type="password" formControlName="password" autocomplete="new-password" />
         </label>
+        @if (mostrarError('password')) {
+          <p class="mensaje mensaje--error">
+            {{ form.controls.password.errors?.['required'] ? 'Ingresá una contraseña.' : 'La contraseña debe tener al menos 6 caracteres.' }}
+          </p>
+        }
 
         <label>
           Confirmar contraseña
@@ -45,6 +72,10 @@
             autocomplete="new-password"
           />
         </label>
+
+        @if (mostrarError('confirmarPassword')) {
+          <p class="mensaje mensaje--error">Repetí la contraseña.</p>
+        }
 
         @if (form.errors?.['passwordsNoCoinciden'] && form.get('confirmarPassword')?.touched) {
           <p class="mensaje mensaje--error">Las contraseñas no coinciden.</p>

@@ -5,6 +5,7 @@ import { AuthService } from '../../../core/services/auth.service';
 
 type EstadoLogin = 'inicial' | 'enviando' | 'error' | 'recuperar_enviado';
 
+import { mensajeDeError } from '../../../core/utils/error.util';
 @Component({
   selector: 'app-login',
   standalone: true,
@@ -43,7 +44,7 @@ export class Login {
     const { error } = await this.authService.iniciarSesion(email!, password!);
 
     if (error) {
-      this.mensajeError.set(error.message);
+      this.mensajeError.set(mensajeDeError(error, 'No se pudo iniciar sesión.'));
       this.estado.set('error');
       return;
     }

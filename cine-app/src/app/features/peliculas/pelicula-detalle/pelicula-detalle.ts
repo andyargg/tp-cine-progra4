@@ -8,7 +8,7 @@ import { SalasService } from '../../../core/services/salas.service';
 import { ResenasService } from '../../../core/services/resenas.service';
 import { AuthService } from '../../../core/services/auth.service';
 import { ToastService } from '../../../core/services/toast.service';
-import { calcularPrecioVigente } from '../../../core/utils/funciones.util';
+import { calcularPrecioVigente, ventaAbiertaDesde } from '../../../core/utils/funciones.util';
 import { mensajeDeError } from '../../../core/utils/error.util';
 import {
   Funcion,
@@ -21,6 +21,8 @@ interface HorarioMostrado {
   funcion: Funcion;
   precioVigente: number;
   nombreSala: string;
+  ventaDesde: Date | null;
+  enPreventa: boolean;
 }
 
 @Component({
@@ -94,6 +96,11 @@ export class PeliculaDetalle {
             ahora,
           ),
           nombreSala: salas.find((s) => s.id === funcion.sala_id)?.nombre ?? '',
+          ventaDesde: ventaAbiertaDesde(pelicula.estreno_fecha, pelicula.preventa_apertura, ahora),
+          enPreventa:
+            !ventaAbiertaDesde(pelicula.estreno_fecha, pelicula.preventa_apertura, ahora) &&
+            !!pelicula.estreno_fecha &&
+            ahora < new Date(`${pelicula.estreno_fecha}T00:00:00`),
         })),
       );
     } catch (err) {
