@@ -55,6 +55,26 @@ export class RecompensasService {
     return data as string;
   }
 
+  async obtenerCanje(canjeId: string): Promise<Canje | null> {
+    const { data, error } = await this.supabaseService.client
+      .from('canjes')
+      .select('*')
+      .eq('id', canjeId)
+      .maybeSingle();
+
+    if (error) return null;
+    return data;
+  }
+
+  async validarCanje(canjeId: string): Promise<string> {
+    const { data, error } = await this.supabaseService.client.rpc('validar_canje', {
+      p_canje_id: canjeId,
+    });
+
+    if (error) throw error;
+    return data as string;
+  }
+
   async listarMisCanjes(): Promise<Canje[]> {
     const usuario = this.authService.usuarioActual();
     if (!usuario) return [];

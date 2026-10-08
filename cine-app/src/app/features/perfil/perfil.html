@@ -73,7 +73,9 @@
               <span class="compra__fecha">{{ compra.created_at | date: 'd/M/yy HH:mm' }}</span>
             </div>
             <div class="compra__acciones">
-              <button type="button" (click)="descargarEntrada(compra)">Descargar PDF</button>
+              @if (compra.estado !== 'cancelada') {
+                <button type="button" (click)="descargarEntrada(compra)">Descargar PDF</button>
+              }
               @if (compra.estado === 'confirmada') {
                 <button
                   type="button"
@@ -91,11 +93,13 @@
 
     <h2>Canjear puntos</h2>
 
-    @if (recompensas().length === 0) {
+    <p>Tenés <strong>{{ u.puntos_acumulados }}</strong> puntos (1 punto por cada peso gastado).</p>
+
+    @if (recompensasActivas().length === 0) {
       <p class="vacio">Todavía no hay recompensas disponibles.</p>
     } @else {
       <ul class="compras">
-        @for (recompensa of recompensas(); track recompensa.id) {
+        @for (recompensa of recompensasActivas(); track recompensa.id) {
           <li class="compra">
             <div>
               <strong>{{ recompensa.nombre }}</strong>
@@ -128,7 +132,11 @@
               <span class="compra__fecha"
                 >-{{ canje.puntos_usados }} pts · {{ canje.created_at | date: 'd/M/yy HH:mm' }}</span
               >
+              <span class="compra__estado">{{ canje.retirado ? 'retirado' : 'pendiente de retiro' }}</span>
             </div>
+            @if (!canje.retirado) {
+              <button type="button" (click)="descargarCanje(canje)">Ver QR</button>
+            }
           </li>
         }
       </ul>

@@ -4,7 +4,10 @@
   } @else if (compraConfirmada(); as compra) {
     <div class="confirmacion">
       <h1>¡Compra confirmada!</h1>
-      <p>Total pagado: ${{ compra.total }}</p>
+      <p>Total: ${{ compra.total }}</p>
+      @if (compra.creditoUsado > 0) {
+        <p>Pagado con crédito: ${{ compra.creditoUsado }}</p>
+      }
       <p>
         Butacas:
         @for (b of compra.butacas; track b.fila + b.columna) {
@@ -36,7 +39,7 @@
     <div class="leyenda">
       <span class="leyenda__item"><i class="normal"></i> Normal</span>
       <span class="leyenda__item"><i class="accesible"></i> Accesible</span>
-      <span class="leyenda__item"><i class="vip"></i> VIP</span>
+      <span class="leyenda__item"><i class="vip"></i> VIP (${{ precioVip() }})</span>
       <span class="leyenda__item"><i class="seleccionada"></i> Tu selección</span>
       <span class="leyenda__item"><i class="ocupada"></i> Ocupada ahora</span>
       <span class="leyenda__item"><i class="vendida"></i> Vendida</span>
@@ -103,7 +106,7 @@
     }
 
     <div class="resumen">
-      <p>Butacas seleccionadas: {{ seleccionadas().size }}</p>
+      <p>Butacas seleccionadas: {{ seleccionadas().size }} · Precio por butaca: ${{ precioUnitario() }}</p>
       <p>Subtotal butacas: ${{ subtotal() }}</p>
       @if (subtotalCandy() > 0) {
         <p>Subtotal candy bar: ${{ subtotalCandy() }}</p>
@@ -142,11 +145,26 @@
             [checked]="confirmoVip()"
             (change)="confirmoVip.set(!confirmoVip())"
           />
-          Confirmo que estoy comprando butaca(s) VIP a precio mayor.
+          Confirmo que estoy comprando butaca(s) VIP a ${{ precioVip() }} cada una.
+        </label>
+      }
+
+      @if (creditoDisponible() > 0) {
+        <label class="checkbox">
+          <input
+            type="checkbox"
+            [checked]="usarCredito()"
+            (change)="usarCredito.set(!usarCredito())"
+          />
+          Usar mi crédito disponible (${{ creditoDisponible() }})
         </label>
       }
 
       <p class="total">Total: ${{ totalEstimado() }}</p>
+      @if (creditoAUsar() > 0) {
+        <p>Crédito aplicado: -${{ creditoAUsar() }}</p>
+        <p class="total">A pagar: ${{ totalAPagar() }}</p>
+      }
 
       <button type="button" [disabled]="!puedeConfirmar() || procesando()" (click)="confirmar()">
         @if (procesando()) {

@@ -1,7 +1,26 @@
 <section class="validar">
   <h1>Validar entradas / candy bar</h1>
 
-  @if (!resumen()) {
+  @if (resumenCanje(); as rc) {
+    <div class="resumen">
+      <div class="resumen__header">
+        <h2>Canje de puntos</h2>
+        <button type="button" (click)="limpiar()">Escanear otro</button>
+      </div>
+      <ul>
+        <li>
+          {{ rc.recompensaNombre }} · {{ rc.canje.puntos_usados }} pts ·
+          {{ rc.canje.created_at | date: 'd/M HH:mm' }}
+          <span class="estado" [class.estado--validada]="rc.canje.retirado">
+            {{ rc.canje.retirado ? 'entregado' : 'pendiente' }}
+          </span>
+        </li>
+      </ul>
+      <button type="button" [disabled]="validando() || rc.canje.retirado" (click)="entregarCanje()">
+        Entregar recompensa
+      </button>
+    </div>
+  } @else if (!resumen()) {
     <div class="camara" [class.oculta]="!camaraDisponible()">
       <video #video></video>
     </div>
@@ -32,6 +51,10 @@
         <h2>Compra {{ resumen()!.compra.id }}</h2>
         <button type="button" (click)="limpiar()">Escanear otro</button>
       </div>
+
+      @if (resumen()!.compra.estado === 'cancelada') {
+        <p class="aviso">Esta compra fue cancelada: el QR no es válido.</p>
+      }
 
       @if (resumen()!.entradas.length > 0) {
         <h3>Entradas</h3>

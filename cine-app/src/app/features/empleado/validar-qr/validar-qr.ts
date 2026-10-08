@@ -15,9 +15,10 @@ import { FuncionesService } from '../../../core/services/funciones.service';
 import { PeliculasService } from '../../../core/services/peliculas.service';
 import { ButacasService } from '../../../core/services/butacas.service';
 import { CandyBarService } from '../../../core/services/candy-bar.service';
+import { RecompensasService } from '../../../core/services/recompensas.service';
 import { ToastService } from '../../../core/services/toast.service';
 import { mensajeDeError } from '../../../core/utils/error.util';
-import { Compra, EstadoEntrada } from '../../../core/models/database.types';
+import { Canje, Compra, EstadoEntrada } from '../../../core/models/database.types';
 
 interface EntradaResumen {
   id: string;
@@ -32,6 +33,11 @@ interface ProductoResumen {
   nombre: string;
   cantidad: number;
   retirado: boolean;
+}
+
+interface ResumenCanje {
+  canje: Canje;
+  recompensaNombre: string;
 }
 
 interface ResumenCompra {
@@ -53,6 +59,7 @@ export class ValidarQr implements AfterViewInit, OnDestroy {
   private readonly peliculasService = inject(PeliculasService);
   private readonly butacasService = inject(ButacasService);
   private readonly candyBarService = inject(CandyBarService);
+  private readonly recompensasService = inject(RecompensasService);
   private readonly toastService = inject(ToastService);
 
   private readonly video = viewChild.required<ElementRef<HTMLVideoElement>>('video');
@@ -62,6 +69,7 @@ export class ValidarQr implements AfterViewInit, OnDestroy {
   protected readonly codigoManual = signal('');
   protected readonly buscando = signal(false);
   protected readonly resumen = signal<ResumenCompra | null>(null);
+  protected readonly resumenCanje = signal<ResumenCanje | null>(null);
   protected readonly validando = signal(false);
 
   ngAfterViewInit(): void {
@@ -89,13 +97,27 @@ export class ValidarQr implements AfterViewInit, OnDestroy {
 
   protected limpiar(): void {
     this.resumen.set(null);
+    this.resumenCanje.set(null);
     this.codigoManual.set('');
     this.scanner?.start().catch(() => {});
   }
 
-  private async buscarPorCodigo(compraId: string): Promise<void> {
+  private async buscarPorCodigo(codigo: string): Promise<void> {
     this.buscando.set(true);
     this.scanner?.stop();
+
+    const canje = await this.recompensasService.obtenerCanje(codigo);
+    if (canje) {
+      const recompensas = await this.recompensasService.listarTodas().catch(() => []);
+      this.resumenCanje.set({
+        canje,
+        recompensaNombre: recompensas.find((r) => r.id === canje.recompensa_id)?.nombre ?? 'Recompensa',
+      });
+      this.buscando.set(false);
+      return;
+    }
+
+    const compraId = codigo;
 
     try {
       const compra = await this.comprasService.obtenerCompra(compraId);
@@ -153,6 +175,23 @@ export class ValidarQr implements AfterViewInit, OnDestroy {
       await this.buscarPorCodigo(resumen.compra.id);
     } catch (err) {
       this.toastService.error(mensajeDeError(err, 'No se pudo validar.'));
+    } finally {
+      this.validando.set(false);
+    }
+  }
+
+  async entregarCanje(): Promise<void> {
+    const resumen = this.resumenCanje();
+    if (!resumen) return;
+
+    this.validando.set(true);
+
+    try {
+      const nombre = await this.recompensasService.validarCanje(resumen.canje.id);
+      this.toastService.exito(`Canje entregado: ${nombre}.`);
+      await this.buscarPorCodigo(resumen.canje.id);
+    } catch (err) {
+      this.toastService.error(mensajeDeError(err, 'No se pudo entregar el canje.'));
     } finally {
       this.validando.set(false);
     }

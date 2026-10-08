@@ -12,7 +12,7 @@ import { CandyBarService } from '../../core/services/candy-bar.service';
 import { RecompensasService } from '../../core/services/recompensas.service';
 import { ToastService } from '../../core/services/toast.service';
 import { calcularEdad } from '../../core/utils/edad.util';
-import { generarEntradaPdf } from '../../core/utils/entrada-pdf.util';
+import { generarCanjePdf, generarEntradaPdf } from '../../core/utils/entrada-pdf.util';
 import { mensajeDeError } from '../../core/utils/error.util';
 import { Canje, Compra, Recompensa } from '../../core/models/database.types';
 import { SelectorFecha } from '../../shared/selector-fecha/selector-fecha';
@@ -46,6 +46,7 @@ export class Perfil {
   protected readonly recompensas = signal<Recompensa[]>([]);
   protected readonly misCanjes = signal<Canje[]>([]);
   protected readonly canjeando = signal<string | null>(null);
+  protected readonly recompensasActivas = computed(() => this.recompensas().filter((r) => r.activa));
 
   protected readonly edad = computed(() => {
     const fechaNacimiento = this.usuario()?.fecha_nacimiento;
@@ -69,7 +70,7 @@ export class Perfil {
 
   private async cargarFidelizacion(): Promise<void> {
     const [recompensas, canjes] = await Promise.all([
-      this.recompensasService.listarActivas(),
+      this.recompensasService.listarTodas(),
       this.recompensasService.listarMisCanjes(),
     ]);
 
@@ -85,16 +86,42 @@ export class Perfil {
     const usuarioActual = this.usuario();
     if (!usuarioActual || usuarioActual.puntos_acumulados < recompensa.costo_puntos) return;
 
+    const ventana = window.open('', '_blank');
     this.canjeando.set(recompensa.id);
 
     try {
-      await this.recompensasService.canjear(recompensa.id);
-      this.toastService.exito(`Canjeaste "${recompensa.nombre}".`);
+      const canjeId = await this.recompensasService.canjear(recompensa.id);
+      await generarCanjePdf({
+        canjeId,
+        recompensaNombre: recompensa.nombre,
+        puntosUsados: recompensa.costo_puntos,
+        fecha: new Date().toISOString(),
+        ventana,
+      });
+      this.toastService.exito(`Canjeaste "${recompensa.nombre}". Presentá el QR en el cine para retirarlo.`);
       await Promise.all([this.cargarFidelizacion(), this.authService.refrescarUsuarioActual()]);
     } catch (err) {
+      ventana?.close();
       this.toastService.error(mensajeDeError(err, 'No se pudo canjear la recompensa.'));
     } finally {
       this.canjeando.set(null);
+    }
+  }
+
+  async descargarCanje(canje: Canje): Promise<void> {
+    const ventana = window.open('', '_blank');
+
+    try {
+      await generarCanjePdf({
+        canjeId: canje.id,
+        recompensaNombre: this.nombreRecompensa(canje.recompensa_id),
+        puntosUsados: canje.puntos_usados,
+        fecha: canje.created_at,
+        ventana,
+      });
+    } catch (err) {
+      ventana?.close();
+      this.toastService.error(mensajeDeError(err, 'No se pudo generar el QR del canje.'));
     }
   }
 

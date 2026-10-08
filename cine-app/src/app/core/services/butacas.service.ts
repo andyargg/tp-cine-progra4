@@ -3,8 +3,6 @@ import { RealtimeChannel } from '@supabase/supabase-js';
 import { SupabaseService } from './supabase.service';
 import { Butaca, ButacaReservadaTemp } from '../models/database.types';
 
-const MINUTOS_RESERVA = 5;
-
 @Injectable({ providedIn: 'root' })
 export class ButacasService {
   private readonly supabaseService = inject(SupabaseService);
@@ -34,14 +32,12 @@ export class ButacasService {
   }
 
   async listarVendidas(funcionId: string): Promise<Set<string>> {
-    const { data, error } = await this.supabaseService.client
-      .from('entradas')
-      .select('butaca_id')
-      .eq('funcion_id', funcionId)
-      .neq('estado', 'cancelada');
+    const { data, error } = await this.supabaseService.client.rpc('butacas_vendidas', {
+      p_funcion_id: funcionId,
+    });
 
     if (error) throw error;
-    return new Set((data ?? []).map((e) => e.butaca_id));
+    return new Set((data ?? []) as string[]);
   }
 
   async listarReservasVigentes(funcionId: string): Promise<ButacaReservadaTemp[]> {
@@ -56,21 +52,21 @@ export class ButacasService {
   }
 
   async reservar(funcionId: string, butacaId: string, sessionId: string): Promise<void> {
-    const expiresAt = new Date(Date.now() + MINUTOS_RESERVA * 60 * 1000).toISOString();
-
-    const { error } = await this.supabaseService.client
-      .from('butacas_reservadas_temp')
-      .upsert({ funcion_id: funcionId, butaca_id: butacaId, session_id: sessionId, expires_at: expiresAt });
+    const { error } = await this.supabaseService.client.rpc('reservar_butaca', {
+      p_funcion_id: funcionId,
+      p_butaca_id: butacaId,
+      p_session_id: sessionId,
+    });
 
     if (error) throw error;
   }
 
-  async liberar(funcionId: string, butacaId: string): Promise<void> {
-    const { error } = await this.supabaseService.client
-      .from('butacas_reservadas_temp')
-      .delete()
-      .eq('funcion_id', funcionId)
-      .eq('butaca_id', butacaId);
+  async liberar(funcionId: string, butacaId: string, sessionId: string): Promise<void> {
+    const { error } = await this.supabaseService.client.rpc('liberar_butaca', {
+      p_funcion_id: funcionId,
+      p_butaca_id: butacaId,
+      p_session_id: sessionId,
+    });
 
     if (error) throw error;
   }

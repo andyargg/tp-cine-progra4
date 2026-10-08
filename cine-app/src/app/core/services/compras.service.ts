@@ -9,6 +9,12 @@ export interface ItemCandyBar {
   cantidad: number;
 }
 
+export interface ResultadoCompra {
+  compraId: string;
+  total: number;
+  creditoUsado: number;
+}
+
 @Injectable({ providedIn: 'root' })
 export class ComprasService {
   private readonly supabaseService = inject(SupabaseService);
@@ -17,20 +23,30 @@ export class ComprasService {
   async confirmarCompra(
     funcionId: string,
     butacaIds: string[],
+    sessionId: string,
     usarCuponBienvenida: boolean,
-    itemsCandy: ItemCandyBar[] = [],
-    codigoCupon: string | null = null,
-  ): Promise<string> {
+    itemsCandy: ItemCandyBar[],
+    codigoCupon: string | null,
+    usarCredito: boolean,
+  ): Promise<ResultadoCompra> {
     const { data, error } = await this.supabaseService.client.rpc('confirmar_compra', {
       p_funcion_id: funcionId,
       p_butaca_ids: butacaIds,
+      p_session_id: sessionId,
       p_usar_cupon_bienvenida: usarCuponBienvenida,
       p_items_candy: itemsCandy,
       p_codigo_cupon: codigoCupon,
+      p_usar_credito: usarCredito,
     });
 
     if (error) throw error;
-    return data as string;
+
+    const resultado = data as { compra_id: string; total: number; credito_usado: number };
+    return {
+      compraId: resultado.compra_id,
+      total: Number(resultado.total),
+      creditoUsado: Number(resultado.credito_usado),
+    };
   }
 
   async cancelarCompra(compraId: string): Promise<void> {

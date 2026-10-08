@@ -57,3 +57,37 @@ export async function generarEntradaPdf(datos: DatosEntradaPdf): Promise<void> {
     doc.save(`entrada-${datos.compraId}.pdf`);
   }
 }
+
+export interface DatosCanjePdf {
+  canjeId: string;
+  recompensaNombre: string;
+  puntosUsados: number;
+  fecha: string;
+  ventana?: Window | null;
+}
+
+export async function generarCanjePdf(datos: DatosCanjePdf): Promise<void> {
+  const qrDataUrl = await QRCode.toDataURL(datos.canjeId, { width: 200 });
+
+  const doc = new jsPDF();
+
+  doc.setFontSize(20);
+  doc.text('CineApp - Canje de puntos', 20, 20);
+
+  doc.setFontSize(14);
+  doc.text(datos.recompensaNombre, 20, 35);
+
+  doc.setFontSize(11);
+  doc.text(`Puntos usados: ${datos.puntosUsados}`, 20, 45);
+  doc.text(`Fecha: ${new Date(datos.fecha).toLocaleString('es-AR')}`, 20, 52);
+  doc.text(`Canje: ${datos.canjeId}`, 20, 59);
+  doc.text('Presentá este QR en el cine para retirar tu recompensa.', 20, 66);
+
+  doc.addImage(qrDataUrl, 'PNG', 20, 76, 60, 60);
+
+  if (datos.ventana) {
+    datos.ventana.location.href = doc.output('bloburl').toString();
+  } else {
+    doc.save(`canje-${datos.canjeId}.pdf`);
+  }
+}

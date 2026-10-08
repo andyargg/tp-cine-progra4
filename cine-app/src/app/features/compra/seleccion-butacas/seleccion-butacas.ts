@@ -26,6 +26,7 @@ import {
 interface CompraConfirmada {
   compraId: string;
   total: number;
+  creditoUsado: number;
   butacas: { fila: string; columna: number }[];
   candyBar: ItemCandyBarPdf[];
 }
@@ -66,6 +67,8 @@ export class SeleccionButacas implements OnDestroy {
   protected readonly usarCuponBienvenida = signal(false);
   protected readonly codigoCupon = signal('');
   protected readonly confirmoVip = signal(false);
+  protected readonly usarCredito = signal(false);
+  protected readonly recargoVip = signal(0);
   protected readonly procesando = signal(false);
   protected readonly compraConfirmada = signal<CompraConfirmada | null>(null);
   protected readonly precioUnitario = signal(0);
@@ -98,7 +101,20 @@ export class SeleccionButacas implements OnDestroy {
     return !!usuario && !usuario.cupon_bienvenida_usado;
   });
 
-  protected readonly subtotal = computed(() => this.precioUnitario() * this.seleccionadas().size);
+  protected readonly creditoDisponible = computed(
+    () => Number(this.authService.usuarioActual()?.credito_disponible ?? 0),
+  );
+
+  protected readonly precioVip = computed(
+    () => Math.round(this.precioUnitario() * (100 + this.recargoVip())) / 100,
+  );
+
+  protected readonly subtotal = computed(() =>
+    this.butacasSeleccionadas().reduce(
+      (acc, b) => acc + (b.tipo === 'vip' ? this.precioVip() : this.precioUnitario()),
+      0,
+    ),
+  );
 
   protected readonly subtotalCandy = computed(() => {
     const cantidadesP = this.cantidadesProductos();
@@ -139,6 +155,14 @@ export class SeleccionButacas implements OnDestroy {
     return conDescuento + this.subtotalCandy();
   });
 
+  protected readonly creditoAUsar = computed(() =>
+    this.usarCredito() ? Math.min(this.creditoDisponible(), this.totalEstimado()) : 0,
+  );
+
+  protected readonly totalAPagar = computed(
+    () => Math.round((this.totalEstimado() - this.creditoAUsar()) * 100) / 100,
+  );
+
   protected readonly puedeConfirmar = computed(
     () => this.seleccionadas().size > 0 && (!this.hayVipSeleccionada() || this.confirmoVip()),
   );
@@ -152,7 +176,7 @@ export class SeleccionButacas implements OnDestroy {
     if (this.intervalo) clearInterval(this.intervalo);
 
     for (const butacaId of this.seleccionadas()) {
-      this.butacasService.liberar(this.funcionId, butacaId);
+      this.butacasService.liberar(this.funcionId, butacaId, this.sessionId).catch(() => {});
     }
   }
 
@@ -167,19 +191,31 @@ export class SeleccionButacas implements OnDestroy {
     if (this.vendidas().has(butaca.id) || this.reservasAjenas().has(butaca.id)) return;
 
     const actuales = new Set(this.seleccionadas());
+    const estabaSeleccionada = actuales.has(butaca.id);
+
+    if (estabaSeleccionada) {
+      actuales.delete(butaca.id);
+    } else {
+      actuales.add(butaca.id);
+    }
+    this.seleccionadas.set(actuales);
 
     try {
-      if (actuales.has(butaca.id)) {
-        actuales.delete(butaca.id);
-        this.seleccionadas.set(actuales);
-        await this.butacasService.liberar(this.funcionId, butaca.id);
+      if (estabaSeleccionada) {
+        await this.butacasService.liberar(this.funcionId, butaca.id, this.sessionId);
       } else {
-        actuales.add(butaca.id);
-        this.seleccionadas.set(actuales);
         await this.butacasService.reservar(this.funcionId, butaca.id, this.sessionId);
       }
     } catch (err) {
+      const revertidas = new Set(this.seleccionadas());
+      if (estabaSeleccionada) {
+        revertidas.add(butaca.id);
+      } else {
+        revertidas.delete(butaca.id);
+      }
+      this.seleccionadas.set(revertidas);
       this.toastService.error(mensajeDeError(err, 'No se pudo actualizar la butaca.'));
+      await this.actualizarEstadoOcupacion();
     }
   }
 
@@ -224,28 +260,35 @@ export class SeleccionButacas implements OnDestroy {
     const codigo = this.codigoCupon().trim();
 
     try {
-      const compraId = await this.comprasService.confirmarCompra(
+      const resultado = await this.comprasService.confirmarCompra(
         this.funcionId,
         butacasElegidas.map((b) => b.id),
+        this.sessionId,
         this.usarCuponBienvenida() && this.puedeUsarCupon() && !codigo,
         this.itemsCandySeleccionados(),
         codigo || null,
+        this.usarCredito() && this.creditoDisponible() > 0,
       );
 
-      const compra = await this.comprasService.obtenerCompra(compraId);
-
+      this.seleccionadas.set(new Set());
       this.compraConfirmada.set({
-        compraId,
-        total: compra.total,
+        compraId: resultado.compraId,
+        total: resultado.total,
+        creditoUsado: resultado.creditoUsado,
         butacas: butacasElegidas.map((b) => ({ fila: b.fila, columna: b.columna })),
         candyBar,
       });
 
       await this.descargarPdf(ventanaEntrada);
       this.toastService.exito('¡Compra confirmada! Descargamos tu entrada en PDF.');
+
+      if (this.authService.usuarioActual()) {
+        await this.authService.refrescarUsuarioActual();
+      }
     } catch (err) {
       ventanaEntrada?.close();
       this.toastService.error(mensajeDeError(err, 'No se pudo confirmar la compra.'));
+      await this.actualizarEstadoOcupacion();
     } finally {
       this.procesando.set(false);
     }
@@ -344,11 +387,13 @@ export class SeleccionButacas implements OnDestroy {
   private async cargarBufferConfig(): Promise<void> {
     const { data } = await this.supabaseService.client
       .from('configuracion')
-      .select('valor')
-      .eq('clave', 'cupon_bienvenida_porcentaje')
-      .single();
+      .select('clave, valor')
+      .in('clave', ['cupon_bienvenida_porcentaje', 'recargo_vip_porcentaje']);
 
-    if (data) this.porcentajeCupon.set(Number(data.valor));
+    for (const fila of data ?? []) {
+      if (fila.clave === 'cupon_bienvenida_porcentaje') this.porcentajeCupon.set(Number(fila.valor));
+      if (fila.clave === 'recargo_vip_porcentaje') this.recargoVip.set(Number(fila.valor));
+    }
   }
 
   private async actualizarEstadoOcupacion(): Promise<void> {
@@ -358,6 +403,11 @@ export class SeleccionButacas implements OnDestroy {
     ]);
 
     this.vendidas.set(vendidas);
+
+    const seleccionValida = [...this.seleccionadas()].filter((id) => !vendidas.has(id));
+    if (seleccionValida.length !== this.seleccionadas().size) {
+      this.seleccionadas.set(new Set(seleccionValida));
+    }
 
     const ajenas = new Map<string, string>();
     for (const reserva of reservas) {

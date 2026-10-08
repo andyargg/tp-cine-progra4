@@ -156,6 +156,7 @@ export interface Canje {
   usuario_id: string;
   recompensa_id: string;
   puntos_usados: number;
+  retirado: boolean;
   created_at: string;
 }
 
