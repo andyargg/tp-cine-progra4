@@ -666,3 +666,9 @@ set puntos_acumulados = greatest(coalesce((
       select sum(case when m.tipo = 'generado' then m.monto else -m.monto end)
       from public.movimientos_credito m where m.usuario_id = u.id
     ), 0), 0);
+
+create or replace function public.es_admin()
+returns boolean language sql stable as $$ select coalesce(public.rol_actual() = 'admin', false) $$;
+
+create or replace function public.es_staff()
+returns boolean language sql stable as $$ select coalesce(public.rol_actual() in ('admin', 'empleado'), false) $$;
